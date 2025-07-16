@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -12,4 +6,75 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Action {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  description   String?
+  ProfileOption ProfileOption[]
+}
+
+model Module {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  uri         String   @default("")
+  Option      Option[]
+}
+
+model Option {
+  name          String          @unique
+  description   String?
+  moduleId      Int
+  id            Int             @id @default(autoincrement())
+  iconName      String?
+  uri           String          @default("")
+  Module        Module          @relation(fields: [moduleId], references: [id])
+  ProfileOption ProfileOption[]
+}
+
+model Profile {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  description   String?
+  ProfileOption ProfileOption[]
+  UserProfile   UserProfile[]
+}
+
+model ProfileOption {
+  profileId Int
+  actionId  Int
+  id        Int     @id @default(autoincrement())
+  optionId  Int
+  Action    Action  @relation(fields: [actionId], references: [id])
+  Option    Option  @relation(fields: [optionId], references: [id])
+  Profile   Profile @relation(fields: [profileId], references: [id])
+}
+
+model Task {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  userId      Int
+  User        User    @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  name        String
+  surname     String
+  email       String        @unique
+  password    String
+  Task        Task[]
+  UserProfile UserProfile[]
+}
+
+model UserProfile {
+  userId    Int
+  profileId Int
+  Profile   Profile @relation(fields: [profileId], references: [id])
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, profileId])
 }
