@@ -1,17 +1,23 @@
 import { PrismaClient } from '../../../generated/prisma';
 import { parseArgs } from 'node:util';
 import userSeeder from '../seeders/development/userSeeder';
+import resetDatabase from '../seeders/resetDatabase';
 
 const prisma = new PrismaClient();
 
 const options = {
   environment: { type: 'string' as const },
+  reset: { type: 'boolean' as const },
 };
 
 async function main() {
   const {
-    values: { environment },
+    values: { environment, reset },
   } = parseArgs({ options });
+
+  if (reset) {
+    await resetDatabase();
+  }
 
   switch (environment) {
     case 'development':

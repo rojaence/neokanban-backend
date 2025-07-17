@@ -13,8 +13,8 @@ model Action {
   name          String          @unique
   description   String?
   ProfileOption ProfileOption[]
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Module {
@@ -23,8 +23,8 @@ model Module {
   description String?
   uri         String   @default("")
   Option      Option[]
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Option {
@@ -36,8 +36,8 @@ model Option {
   uri           String          @default("")
   Module        Module          @relation(fields: [moduleId], references: [id])
   ProfileOption ProfileOption[]
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Profile {
@@ -46,8 +46,8 @@ model Profile {
   description   String?
   ProfileOption ProfileOption[]
   UserProfile   UserProfile[]
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProfileOption {
@@ -58,8 +58,8 @@ model ProfileOption {
   Action    Action  @relation(fields: [actionId], references: [id])
   Option    Option  @relation(fields: [optionId], references: [id])
   Profile   Profile @relation(fields: [profileId], references: [id])
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Task {
@@ -68,8 +68,8 @@ model Task {
   description String?
   userId      Int
   User        User    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
@@ -80,8 +80,8 @@ model User {
   password    String
   Task        Task[]
   UserProfile UserProfile[]
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserProfile {
@@ -89,8 +89,8 @@ model UserProfile {
   profileId Int
   Profile   Profile @relation(fields: [profileId], references: [id])
   User      User    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now()) @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@id([userId, profileId])
 }
