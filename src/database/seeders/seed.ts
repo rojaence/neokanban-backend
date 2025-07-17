@@ -1,5 +1,6 @@
 import { PrismaClient } from '../../../generated/prisma';
 import { parseArgs } from 'node:util';
+import userSeeder from '../seeders/development/userSeeder';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,14 @@ async function main() {
   switch (environment) {
     case 'development':
       // Seed data for development
-      await new Promise((resolve) => resolve(true));
+      try {
+        await userSeeder();
+        await prisma.$disconnect();
+      } catch (error) {
+        console.error(error);
+        await prisma.$disconnect();
+        process.exit(1);
+      }
       break;
   }
 }
