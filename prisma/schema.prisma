@@ -78,6 +78,7 @@ model User {
   surname     String
   email       String        @unique
   password    String
+  username    String        @unique
   Task        Task[]
   UserProfile UserProfile[]
   createdAt DateTime @default(now())

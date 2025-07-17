@@ -22,6 +22,7 @@ async function main() {
       email: adminData.email,
       name: adminData.name,
       surname: adminData.surname,
+      username: 'ronnye',
       password,
       createdAt: new Date(),
     },
