@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { parseArgs } from 'node:util';
 import userSeeder from '../seeders/development/userSeeder';
 import resetDatabase from '../seeders/resetDatabase';

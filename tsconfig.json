@@ -19,7 +19,9 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@src/*": ["src/*"],
-      "@auth/*": ["src/modules/auth/*"]
+      "@auth/*": ["src/modules/auth/*"],
+      "@database/*": ["src/database/*"],
+      "@environment/*": ["src/environment/*"],
     }
   }
 }

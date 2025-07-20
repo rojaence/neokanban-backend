@@ -1,0 +1,6 @@
+{
+  "auth": {
+    "invalidCredentials": "Credenciales inválidas",
+    "userNotFound": "Usuario no encontrado"
+  }
+}
