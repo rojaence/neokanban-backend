@@ -23,7 +23,7 @@ describe('BcryptService', () => {
   });
 
   it('should compare correct password', async () => {
-    const passRaw = 'mi password segura';
+    const passRaw = 'hashed-password';
     const passGen = await service.genPasswordHash(passRaw);
     const isCorrect = await service.chechPasswordHash(passRaw, passGen);
     expect(isCorrect).toBe(true);

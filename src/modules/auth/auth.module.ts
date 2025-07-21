@@ -1,19 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './services/auth/auth.service';
 import { AuthRepository } from '@auth/repositories/auth.repository';
-import { PrismaService } from '@src/database/prisma/prisma.service';
-import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
-import { HttpResponse } from '@src/common/helpers/http-response';
+import { CommonModule } from '@src/common/common.module';
 import { JwtService } from './services/jwt/jwt.service';
+import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 
 @Module({
-  providers: [
-    AuthService,
-    AuthRepository,
-    PrismaService,
-    BcryptService,
-    HttpResponse,
-    JwtService,
-  ],
+  providers: [AuthService, AuthRepository, BcryptService, JwtService],
+  imports: [CommonModule],
 })
 export class AuthModule {}

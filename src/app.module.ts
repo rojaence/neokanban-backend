@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from './database/prisma/prisma.service';
 import { AuthModule } from './modules/auth/auth.module';
-import { BcryptService } from './common/services/bcrypt/bcrypt.service';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import * as path from 'path';
 
@@ -13,9 +11,13 @@ import * as path from 'path';
     I18nModule.forRoot({
       fallbackLanguage: 'es',
       loaderOptions: {
-        path: path.join(__dirname, '/common/translations'),
+        path: path.join(process.cwd(), 'src/i18n/'),
         watch: true,
       },
+      typesOutputPath: path.join(
+        process.cwd(),
+        'src/generated/i18n.generated.ts',
+      ),
       resolvers: [
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
@@ -23,6 +25,6 @@ import * as path from 'path';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, BcryptService],
+  providers: [AppService],
 })
 export class AppModule {}

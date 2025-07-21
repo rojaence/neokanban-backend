@@ -10,7 +10,7 @@ export class BaseUnitTestModule {
         I18nModule.forRoot({
           fallbackLanguage: 'es',
           loaderOptions: {
-            path: path.join(__dirname, '../../src/common/translations'),
+            path: path.join(__dirname, '../../src/i18n'),
             watch: false,
           },
           resolvers: [

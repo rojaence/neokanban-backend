@@ -8,6 +8,9 @@ export class AuthRepository {
   async findUserByUsername(username: string) {
     return await this.prisma.user.findUnique({
       where: { username },
+      include: {
+        UserProfile: true,
+      },
     });
   }
 }

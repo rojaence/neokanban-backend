@@ -6,16 +6,16 @@ import {
 import { LoginDto } from '../../models/login.dto';
 import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
-import { I18nService } from 'nestjs-i18n';
-import { HttpResponse } from '@src/common/helpers/http-response';
+import { TranslationService } from '@src/common/helpers/i18n-translation';
+import { JwtService } from '../jwt/jwt.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly bcryptService: BcryptService,
-    private readonly translation: I18nService,
-    private readonly httpResponse: HttpResponse,
+    private readonly translation: TranslationService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async login(credentials: LoginDto) {
@@ -34,5 +34,10 @@ export class AuthService {
         this.translation.t('auth.invalidCredentials'),
       );
     }
+    const token = this.jwtService.generateToken({
+      roleId: 1,
+      username: user.username,
+    });
+    return token;
   }
 }
