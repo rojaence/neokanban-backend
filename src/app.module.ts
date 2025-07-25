@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import * as path from 'path';
+import { APP_FILTER } from '@nestjs/core';
+import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
+import { TranslationService } from './common/helpers/i18n-translation';
 
 @Module({
   imports: [
@@ -25,6 +28,13 @@ import * as path from 'path';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    TranslationService,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

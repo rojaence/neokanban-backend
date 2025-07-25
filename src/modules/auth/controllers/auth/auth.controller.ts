@@ -11,7 +11,7 @@ export class AuthController {
     private readonly translation: TranslationService,
   ) {}
 
-  @Post()
+  @Post('/login')
   async login(@Body() credentials: LoginDto) {
     const token = await this.authService.login(credentials);
     return HttpResponse.success({
