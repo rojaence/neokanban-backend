@@ -1,6 +1,6 @@
 import { BcryptService } from '../../../common/services/bcrypt/bcrypt.service';
 import { PrismaClient } from '@prisma/client';
-import environment from '../../../environment/environment';
+import environment from '@src/environment/environment';
 
 const prisma = new PrismaClient();
 const bcryptService: BcryptService = new BcryptService();

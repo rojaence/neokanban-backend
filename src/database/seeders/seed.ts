@@ -31,6 +31,17 @@ async function main() {
         process.exit(1);
       }
       break;
+    case 'test':
+      // Seed data for development
+      try {
+        await userSeeder();
+        await prisma.$disconnect();
+      } catch (error) {
+        console.error(error);
+        await prisma.$disconnect();
+        process.exit(1);
+      }
+      break;
   }
 }
 

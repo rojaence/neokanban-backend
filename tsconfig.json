@@ -23,6 +23,7 @@
       "@database/*": ["src/database/*"],
       "@environment/*": ["src/environment/*"],
       "@translation/*": ["src/generated/*"],
+      "@test/*": ["src/test/*"],
     }
   }
 }

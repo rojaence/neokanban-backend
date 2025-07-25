@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 
 export interface IHttpResponse<T> {
   statusCode: HttpStatus;
@@ -7,9 +7,8 @@ export interface IHttpResponse<T> {
   error?: T;
 }
 
-@Injectable()
 export class HttpResponse {
-  success<T>({
+  static success<T>({
     data,
     message = 'Success',
     statusCode = HttpStatus.OK,
@@ -21,7 +20,7 @@ export class HttpResponse {
     };
   }
 
-  error<T>(
+  static error<T>(
     message: string,
     statusCode: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
     error: T,
