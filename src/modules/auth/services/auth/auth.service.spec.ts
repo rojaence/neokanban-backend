@@ -47,7 +47,9 @@ describe('AuthService', () => {
   it('should handle error to user not found', async () => {
     const credentials = { username: 'noexistsuser', password: '12345' };
     const loginFunction = async () => await service.login(credentials);
-    const errorMessage = translationService.t('auth.userNotFound') as string;
+    const errorMessage = translationService.t(
+      'auth.invalidCredentials',
+    ) as string;
     await expect(loginFunction).rejects.toThrow(errorMessage);
   });
 

@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from '../../models/login.dto';
 import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
@@ -23,7 +19,9 @@ export class AuthService {
       credentials.username,
     );
     if (!user)
-      throw new NotFoundException(this.translation.t('auth.userNotFound'));
+      throw new UnauthorizedException(
+        this.translation.t('auth.invalidCredentials'),
+      );
 
     const isValid = await this.bcryptService.chechPasswordHash(
       credentials.password,
