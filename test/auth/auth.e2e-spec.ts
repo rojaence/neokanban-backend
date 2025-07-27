@@ -30,6 +30,7 @@ describe('AuthController (e2e)', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data).toHaveProperty('token');
     expect(typeof res.body.data.token).toBe('string');
+    expect(res.headers['set-cookie']).toBeDefined();
   });
 
   it('/ (POST) should return a 401 with invalid credentials', async () => {
@@ -39,12 +40,12 @@ describe('AuthController (e2e)', () => {
         username: 'ronnye',
         password: 'no valid password',
       });
-    console.log('🚀 ~ res:', res.body);
     const errorMessage = translationService.t(
       'auth.invalidCredentials',
     ) as string;
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(res.body).toHaveProperty('error');
     expect(res.body.error).toBe(errorMessage);
+    expect(res.headers['set-cookie']).toBeUndefined();
   });
 });
