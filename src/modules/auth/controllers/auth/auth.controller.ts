@@ -1,8 +1,9 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { LoginDto } from '../../models/login.dto';
 import { AuthService } from '../../services/auth/auth.service';
 import { HttpResponse } from '@src/common/helpers/http-response';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -12,14 +13,18 @@ export class AuthController {
   ) {}
 
   @Post('/login')
-  async login(@Body() credentials: LoginDto) {
+  async login(@Body() credentials: LoginDto, @Res() response: Response) {
     const token = await this.authService.login(credentials);
-    return HttpResponse.success({
+    response.setHeader('Authorization', `Bearer ${token}`);
+
+    const result = HttpResponse.success({
       statusCode: HttpStatus.OK,
       data: {
         token,
       },
       message: this.translation.t('validation.httpMessages.success') as string,
     });
+
+    response.status(HttpStatus.OK).json(result);
   }
 }

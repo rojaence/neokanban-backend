@@ -1,13 +1,13 @@
+import env from '../../../environment/environment';
 import { BcryptService } from '../../../common/services/bcrypt/bcrypt.service';
 import { PrismaClient } from '@prisma/client';
-import environment from '@src/environment/environment';
 
 const prisma = new PrismaClient();
 const bcryptService: BcryptService = new BcryptService();
 
 async function main() {
   const password = await bcryptService.genPasswordHash(
-    environment.USER_DEFAULT_PASSWORD,
+    env.USER_DEFAULT_PASSWORD,
   );
   const adminData = {
     email: 'admin@example.com',

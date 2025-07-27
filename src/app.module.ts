@@ -7,6 +7,7 @@ import * as path from 'path';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
 import { TranslationService } from './common/helpers/i18n-translation';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -25,6 +26,19 @@ import { TranslationService } from './common/helpers/i18n-translation';
         { use: QueryResolver, options: ['lang'] },
         AcceptLanguageResolver,
       ],
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: (() => {
+        switch (process.env.NODE_ENV) {
+          case 'test':
+            return '.env.test';
+          case 'development':
+            return '.env';
+          default:
+            return '.env';
+        }
+      })(),
     }),
   ],
   controllers: [AppController],
