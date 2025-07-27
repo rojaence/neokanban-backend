@@ -1,11 +1,9 @@
-import { JwtPayload } from 'jsonwebtoken';
-
 export interface CredentialsI {
   username: string;
   password: string;
 }
 
-export interface IJwtPayload extends JwtPayload {
+export interface IJwtPayload {
   username: string;
   roleId: string | number;
 }

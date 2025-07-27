@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { execSync } from 'child_process';
 import { App } from 'supertest/types';
+import * as cookieParser from 'cookie-parser';
 
 interface SetupTestAppI {
   app: INestApplication<App>;
@@ -22,6 +23,7 @@ export const setupTestApp = async (): Promise<SetupTestAppI> => {
   }).compile();
 
   const app: INestApplication<App> = moduleFixture.createNestApplication();
+  app.use(cookieParser());
   await app.init();
   return { app, module: moduleFixture };
 };

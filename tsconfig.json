@@ -24,6 +24,7 @@
       "@environment/*": ["src/environment/*"],
       "@translation/*": ["src/generated/*"],
       "@test/*": ["src/test/*"],
-    }
+    },
+    "typeRoots": ["./types" ,"./node_modules/@types"]
   }
 }

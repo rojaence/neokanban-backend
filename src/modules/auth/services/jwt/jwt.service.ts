@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { sign, verify } from 'jsonwebtoken';
+import { sign, SignOptions, verify } from 'jsonwebtoken';
 import environment from '@environment/environment';
 import { IJwtPayload } from '../../models/auth.interface';
 
@@ -7,15 +7,16 @@ import { IJwtPayload } from '../../models/auth.interface';
 export class JwtService {
   private secretKey = environment.JWT_SECRET ?? 'default';
 
-  generateToken(data: IJwtPayload) {
-    const expiredIn = environment.JWT_EXPIRATION;
+  generateToken(data: IJwtPayload, options?: Partial<SignOptions>) {
+    const expiresIn = environment.JWT_EXPIRATION;
+    let jwtOptions: Partial<SignOptions> = {};
     const payload = {
       ...data,
-      exp: data.exp
-        ? Math.floor(Date.now() / 1000) + data.exp
-        : Math.floor(Date.now() / 1000) + expiredIn,
     };
-    return sign(payload, this.secretKey);
+    if (options) {
+      jwtOptions = { ...options, expiresIn: options.expiresIn ?? expiresIn };
+    }
+    return sign(payload, this.secretKey, jwtOptions);
   }
 
   verifyToken(token: string) {
@@ -28,7 +29,7 @@ export class JwtService {
     } catch (error) {
       if (error instanceof Error) {
         return {
-          decoded: error.message,
+          decoded: null,
           valid: false,
         };
       }

@@ -21,7 +21,6 @@ describe('JwtService', () => {
     const payload: IJwtPayload = {
       username: 'testuser',
       roleId: 1,
-      exp: 3600,
     };
     const token = service.generateToken(payload);
     expect(token).toBeDefined();
@@ -31,7 +30,6 @@ describe('JwtService', () => {
     const payload: IJwtPayload = {
       username: 'testuser',
       roleId: 1,
-      exp: 3600,
     };
     const token = service.generateToken(payload);
     const result = service.verifyToken(token);

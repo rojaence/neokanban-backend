@@ -38,4 +38,11 @@ export class AuthService {
     });
     return token;
   }
+
+  async profile(username: string) {
+    const user = await this.authRepository.findUserByUsername(username);
+    if (!user)
+      throw new UnauthorizedException(this.translation.t('auth.userNotFound'));
+    return user;
+  }
 }

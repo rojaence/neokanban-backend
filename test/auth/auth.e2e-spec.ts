@@ -48,4 +48,9 @@ describe('AuthController (e2e)', () => {
     expect(res.body.error).toBe(errorMessage);
     expect(res.headers['set-cookie']).toBeUndefined();
   });
+
+  it('/ (GET) should throw unauthorized if no authentication', async () => {
+    const res = await request(testApp.getHttpServer()).get('/auth/profile');
+    expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
 });

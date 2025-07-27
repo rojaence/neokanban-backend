@@ -21,6 +21,7 @@ export class MockPrismaService {
             return {
               id: 1,
               username: 'testuser',
+              email: 'testuser@example.com',
               password: environment.USER_DEFAULT_PASSWORD_HASH,
             };
           }

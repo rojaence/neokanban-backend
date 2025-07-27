@@ -69,4 +69,19 @@ describe('AuthService', () => {
     expect(typeof token).toBe('string');
     expect(decoded.valid).toBe(true);
   });
+
+  it('should return a user profile with username', async () => {
+    const credentials = { username: 'testuser' };
+    const user = await service.profile(credentials.username);
+    expect(user).toBeDefined();
+    expect(user).toHaveProperty('email');
+  });
+
+  it('should return a not found message with invalid username', async () => {
+    const credentials = { username: 'unknown user' };
+    const profileFunction = async () =>
+      await service.profile(credentials.username);
+    const errorMessage = translationService.t('auth.userNotFound') as string;
+    await expect(profileFunction).rejects.toThrow(errorMessage);
+  });
 });
