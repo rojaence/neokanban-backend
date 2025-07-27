@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
-import environment from '@src/environment/environment.test';
+import environment from '@src/environment/environment';
 
 @Injectable()
 export class MockPrismaService {
   user: any;
+  $queryRaw: any;
 
   constructor(private bcryptService: BcryptService) {
     this.initializeMockUser();
+    this.initializeQueryRaw();
   }
 
   private initializeMockUser() {
@@ -28,5 +30,18 @@ export class MockPrismaService {
       update: jest.fn(),
       delete: jest.fn(),
     };
+  }
+
+  private initializeQueryRaw() {
+    this.$queryRaw = jest.fn((strings: TemplateStringsArray) => {
+      const query = strings.join('').trim().toLowerCase();
+
+      if (query === 'select now()') {
+        const date = Date.now();
+        return Promise.resolve([{ now: date.toLocaleString() }]);
+      }
+
+      return Promise.resolve([]);
+    });
   }
 }

@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '@src/database/prisma/prisma.service';
 import { BaseUnitTestModule } from '../../../../common/test/unit/unit-test.module';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
-import { CommonModule } from '@src/common/common.module';
 import { MockPrismaService } from '@src/database/mocks/prismaClient/mockPrisma.service';
 import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
@@ -27,7 +26,7 @@ describe('AuthService', () => {
           useClass: MockPrismaService,
         },
       ],
-      imports: [BaseUnitTestModule.forRoot(), CommonModule],
+      imports: [BaseUnitTestModule.forRoot()],
     }).compile();
 
     service = module.get<AuthService>(AuthService);

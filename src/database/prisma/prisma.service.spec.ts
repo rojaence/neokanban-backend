@@ -1,23 +1,31 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from './prisma.service';
+import { MockPrismaService } from '../mocks/prismaClient/mockPrisma.service';
+import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 
 describe('PrismaService', () => {
-  let service: PrismaService;
+  let db: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService],
+      providers: [
+        {
+          provide: PrismaService,
+          useClass: MockPrismaService,
+        },
+        BcryptService,
+      ],
     }).compile();
 
-    service = module.get<PrismaService>(PrismaService);
+    db = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(db).toBeDefined();
   });
 
   it('should be connect to database', async () => {
-    const query = await service.$queryRaw`select now()`;
+    const query = await db.$queryRaw`select now()`;
     expect(query).toBeDefined();
   });
 });

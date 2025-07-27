@@ -23,6 +23,7 @@ dotenv.config({
 
 export interface EnvironmentConfigI {
   USER_DEFAULT_PASSWORD: string;
+  USER_DEFAULT_PASSWORD_HASH: string;
   JWT_SECRET: string;
   JWT_EXPIRATION: number;
   DATABASE_URL: string;
@@ -30,6 +31,9 @@ export interface EnvironmentConfigI {
 
 const environment: EnvironmentConfigI = {
   USER_DEFAULT_PASSWORD: String(process.env.USER_DEFAULT_PASSWORD || '12345'),
+  USER_DEFAULT_PASSWORD_HASH: String(
+    process.env.USER_DEFAULT_PASSWORD_HASH || '',
+  ),
   JWT_SECRET: String(process.env.JWT_SECRET || ''),
   JWT_EXPIRATION: Number(process.env.JWT_EXPIRATION || '3600'),
   DATABASE_URL: String(process.env.DATABASE_URL || ''),
