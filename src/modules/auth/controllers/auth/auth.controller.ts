@@ -37,7 +37,6 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       maxAge: environment.JWT_EXPIRATION,
       sameSite: 'lax',
-      path: '/',
     });
 
     const result = HttpResponse.success({
@@ -62,5 +61,26 @@ export class AuthController {
       },
       message: this.translation.t('validation.httpMessages.success') as string,
     });
+  }
+
+  @Post('/logout')
+  @UseGuards(AuthGuard)
+  logout(
+    @User() user: IJwtPayload,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    response.cookie(CredentialsEnum.tokenKey, null, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      expires: new Date(0),
+      sameSite: 'lax',
+    });
+
+    const result = HttpResponse.success({
+      statusCode: HttpStatus.OK,
+      message: this.translation.t('validation.httpMessages.success') as string,
+    });
+
+    return response.status(HttpStatus.OK).json(result);
   }
 }

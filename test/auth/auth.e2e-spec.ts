@@ -53,4 +53,28 @@ describe('AuthController (e2e)', () => {
     const res = await request(testApp.getHttpServer()).get('/auth/profile');
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
   });
+
+  it('/ (POST) should logout successfully', async () => {
+    const res = await request(testApp.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: 'ronnye',
+        password: '12345',
+      });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('token');
+    expect(typeof res.body.data.token).toBe('string');
+    expect(res.headers['set-cookie']).toBeDefined();
+
+    const cookies = res.headers['set-cookie'];
+
+    const logout = await request(testApp.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', cookies);
+    expect(logout.status).toBe(200);
+
+    const profile = await request(testApp.getHttpServer()).get('/auth/profile');
+    expect(profile.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
 });
