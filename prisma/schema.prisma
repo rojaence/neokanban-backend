@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public", "security", "manager"]
 }
 
 model Action {
@@ -14,6 +16,8 @@ model Action {
   ProfileOption ProfileOption[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_actions")
+  @@schema("security")
 }
 
 model Module {
@@ -24,6 +28,8 @@ model Module {
   Option      Option[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_modules")
+  @@schema("security")
 }
 
 model Option {
@@ -37,6 +43,8 @@ model Option {
   ProfileOption ProfileOption[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_options")
+  @@schema("security")
 }
 
 model Profile {
@@ -47,6 +55,8 @@ model Profile {
   UserProfile   UserProfile[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_profiles")
+  @@schema("security")
 }
 
 model ProfileOption {
@@ -59,6 +69,8 @@ model ProfileOption {
   Profile   Profile @relation(fields: [profileId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_profile_options")
+  @@schema("security")
 }
 
 model Task {
@@ -69,7 +81,10 @@ model Task {
   User        User    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("man_tasks")
+  @@schema("manager")
 }
+
 
 model User {
   id          Int           @id @default(autoincrement())
@@ -82,6 +97,8 @@ model User {
   UserProfile UserProfile[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("sec_users")
+  @@schema("security")
 }
 
 model UserProfile {
@@ -93,4 +110,6 @@ model UserProfile {
   updatedAt DateTime @updatedAt
 
   @@id([userId, profileId])
+  @@map("sec_user_profiles")
+  @@schema("security")
 }
