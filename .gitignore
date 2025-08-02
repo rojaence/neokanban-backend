@@ -47,9 +47,6 @@ lerna-debug.log*
 .temp
 .tmp
 
-# i18n generated types
-src/generated
-
 # Runtime data
 pids
 *.pid

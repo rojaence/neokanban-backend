@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
-import environment from '@src/environment/environment';
-import { randomUUID } from 'crypto';
+import { fakeAdminUser } from '@src/test/fakes/user';
 
 @Injectable()
 export class MockPrismaService {
@@ -18,13 +17,8 @@ export class MockPrismaService {
       findUnique: jest
         .fn()
         .mockImplementation((args: { where: { username: string } }) => {
-          if (args.where.username === 'testuser') {
-            return {
-              id: randomUUID(),
-              username: 'testuser',
-              email: 'testuser@example.com',
-              password: environment.USER_DEFAULT_PASSWORD_HASH,
-            };
+          if (args.where.username === fakeAdminUser.username) {
+            return fakeAdminUser;
           }
           return null;
         }),

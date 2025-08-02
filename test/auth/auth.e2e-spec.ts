@@ -4,10 +4,16 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { setupTestApp } from '../app-e2e-setup';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
+import {
+  defaultFakePassword,
+  fakeAdminUser,
+  FakeUserModel,
+} from '@src/test/fakes/user';
 
 describe('AuthController (e2e)', () => {
   let testApp: INestApplication<App>;
   let translationService: TranslationService;
+  let userData: FakeUserModel;
 
   beforeAll(async () => {
     const { app, module } = await setupTestApp();
@@ -19,12 +25,16 @@ describe('AuthController (e2e)', () => {
     await testApp.close();
   });
 
+  beforeEach(() => {
+    userData = fakeAdminUser;
+  });
+
   it('/ (POST) should return a token with valid credentials', async () => {
     const res = await request(testApp.getHttpServer())
       .post('/auth/login')
       .send({
-        username: 'ronnye',
-        password: '12345',
+        username: userData.username,
+        password: defaultFakePassword,
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
@@ -37,7 +47,7 @@ describe('AuthController (e2e)', () => {
     const res = await request(testApp.getHttpServer())
       .post('/auth/login')
       .send({
-        username: 'ronnye',
+        username: userData.username,
         password: 'no valid password',
       });
     const errorMessage = translationService.t(
@@ -58,8 +68,8 @@ describe('AuthController (e2e)', () => {
     const res = await request(testApp.getHttpServer())
       .post('/auth/login')
       .send({
-        username: 'ronnye',
-        password: '12345',
+        username: userData.username,
+        password: defaultFakePassword,
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');

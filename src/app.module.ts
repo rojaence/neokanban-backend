@@ -11,7 +11,6 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    AuthModule,
     I18nModule.forRoot({
       fallbackLanguage: 'es',
       loaderOptions: {
@@ -40,6 +39,7 @@ import { ConfigModule } from '@nestjs/config';
         }
       })(),
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

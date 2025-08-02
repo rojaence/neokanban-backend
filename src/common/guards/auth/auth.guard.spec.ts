@@ -4,11 +4,13 @@ import { JwtService } from '@src/modules/auth/services/jwt/jwt.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BaseUnitTestModule } from '@src/common/test/unit/unit-test.module';
 import { UnitTestUtils } from '@src/common/test/unit/unit-test.utils';
+import { fakeAdminUser } from '@src/test/fakes/user';
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
   let translation: TranslationService;
   let jwt: JwtService;
+  const userData = fakeAdminUser;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +29,8 @@ describe('AuthGuard', () => {
   it('should return true if valid credentials', () => {
     const token = jwt.generateToken({
       roleId: 1,
-      username: 'markw',
+      username: userData.username,
+      userId: userData.id,
     });
     const context = UnitTestUtils.createMockContext(token);
     const valid = authGuard.canActivate(context);
@@ -52,7 +55,8 @@ describe('AuthGuard', () => {
     const token = jwt.generateToken(
       {
         roleId: 1,
-        username: 'markw',
+        username: userData.username,
+        userId: userData.id,
       },
       { expiresIn: 1 },
     );
@@ -69,7 +73,8 @@ describe('AuthGuard', () => {
     const token = jwt.generateToken(
       {
         roleId: 1,
-        username: 'markw',
+        username: userData.username,
+        userId: userData.id,
       },
       { expiresIn: 1 },
     );
