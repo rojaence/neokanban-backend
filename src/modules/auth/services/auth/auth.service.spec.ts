@@ -7,6 +7,9 @@ import { MockPrismaService } from '@src/database/mocks/prismaClient/mockPrisma.s
 import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { JwtService } from '../jwt/jwt.service';
+import { JwtBlacklistRepository } from '../../repositories/jwt-blacklist.repository';
+import { MongoService } from '@src/database/mongo/mongo.service';
+import { MockMongoService } from '@src/database/mocks/mongo-client/mock-mongo.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -21,9 +24,14 @@ describe('AuthService', () => {
         JwtService,
         TranslationService,
         AuthRepository,
+        JwtBlacklistRepository,
         {
           provide: PrismaService,
           useClass: MockPrismaService,
+        },
+        {
+          provide: MongoService,
+          useClass: MockMongoService,
         },
       ],
       imports: [BaseUnitTestModule.forRoot()],

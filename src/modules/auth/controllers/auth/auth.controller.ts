@@ -17,6 +17,8 @@ import { AuthGuard } from '@src/common/guards/auth/auth.guard';
 import { User } from '@src/common/decorators/user/user.decorator';
 import { IJwtPayload } from '../../models/auth.interface';
 import { CredentialsEnum } from '@src/common/constants/auth';
+import { randomUUID } from 'crypto';
+import { JwtRevokeReason } from '../../models/jwt-blacklist.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -47,7 +49,7 @@ export class AuthController {
       message: this.translation.t('validation.httpMessages.success') as string,
     });
 
-    return response.status(HttpStatus.OK).json(result);
+    response.status(HttpStatus.OK).json(result);
   }
 
   @Get('/profile')
@@ -65,7 +67,7 @@ export class AuthController {
 
   @Post('/logout')
   @UseGuards(AuthGuard)
-  logout(
+  async logout(
     @User() user: IJwtPayload,
     @Res({ passthrough: true }) response: Response,
   ) {
@@ -76,11 +78,19 @@ export class AuthController {
       sameSite: 'lax',
     });
 
+    await this.authService.logout({
+      exp: new Date(user.exp! * 1000),
+      jti: randomUUID(),
+      revokedAt: new Date(),
+      userId: user.userId,
+      reason: JwtRevokeReason.LOGOUT,
+    });
+
     const result = HttpResponse.success({
       statusCode: HttpStatus.OK,
       message: this.translation.t('validation.httpMessages.success') as string,
     });
 
-    return response.status(HttpStatus.OK).json(result);
+    response.status(HttpStatus.OK).json(result);
   }
 }

@@ -32,7 +32,8 @@ export class AuthGuard implements CanActivate {
     const isValidAuth = this.jwtService.verifyToken(authToken);
     if (!authToken || !isValidAuth.valid)
       throw new UnauthorizedException(invalidMessage);
-    request.user = isValidAuth.decoded;
+    const tokenData = this.jwtService.decodeToken(authToken);
+    request.user = tokenData.decoded;
     return true;
   }
 }

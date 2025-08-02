@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import environment from '@src/environment/environment';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class MockPrismaService {
@@ -19,7 +20,7 @@ export class MockPrismaService {
         .mockImplementation((args: { where: { username: string } }) => {
           if (args.where.username === 'testuser') {
             return {
-              id: 1,
+              id: randomUUID(),
               username: 'testuser',
               email: 'testuser@example.com',
               password: environment.USER_DEFAULT_PASSWORD_HASH,

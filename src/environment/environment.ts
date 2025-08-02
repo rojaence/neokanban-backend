@@ -27,6 +27,7 @@ export interface EnvironmentConfigI {
   JWT_SECRET: string;
   JWT_EXPIRATION: number;
   DATABASE_URL: string;
+  MONGO_DATABASE_URL: string;
 }
 
 const environment: EnvironmentConfigI = {
@@ -37,6 +38,7 @@ const environment: EnvironmentConfigI = {
   JWT_SECRET: String(process.env.JWT_SECRET || ''),
   JWT_EXPIRATION: Number(process.env.JWT_EXPIRATION || '3600'),
   DATABASE_URL: String(process.env.DATABASE_URL || ''),
+  MONGO_DATABASE_URL: String(process.env.MONGO_DATABASE_URL || ''),
 };
 
 export default environment;

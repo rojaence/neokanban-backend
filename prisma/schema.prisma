@@ -10,7 +10,7 @@ datasource db {
 }
 
 model Action {
-  id            Int             @id @default(autoincrement())
+  id            String      @id @default(uuid()) @db.Uuid
   name          String          @unique
   description   String?
   ProfileOption ProfileOption[]
@@ -21,7 +21,7 @@ model Action {
 }
 
 model Module {
-  id          Int      @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   name        String
   description String?
   uri         String   @default("")
@@ -35,8 +35,8 @@ model Module {
 model Option {
   name          String          @unique
   description   String?
-  moduleId      Int
-  id            Int             @id @default(autoincrement())
+  moduleId      String          @db.Uuid
+  id            String      @id @default(uuid()) @db.Uuid
   iconName      String?
   uri           String          @default("")
   Module        Module          @relation(fields: [moduleId], references: [id])
@@ -48,7 +48,7 @@ model Option {
 }
 
 model Profile {
-  id            Int             @id @default(autoincrement())
+  id            String      @id @default(uuid()) @db.Uuid
   name          String          @unique
   description   String?
   ProfileOption ProfileOption[]
@@ -60,10 +60,10 @@ model Profile {
 }
 
 model ProfileOption {
-  profileId Int
-  actionId  Int
-  id        Int     @id @default(autoincrement())
-  optionId  Int
+  profileId String      @db.Uuid
+  actionId  String      @db.Uuid
+  id        String      @id @default(uuid()) @db.Uuid
+  optionId  String      @db.Uuid
   Action    Action  @relation(fields: [actionId], references: [id])
   Option    Option  @relation(fields: [optionId], references: [id])
   Profile   Profile @relation(fields: [profileId], references: [id])
@@ -74,10 +74,10 @@ model ProfileOption {
 }
 
 model Task {
-  id          Int     @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   title       String
   description String?
-  userId      Int
+  userId      String      @db.Uuid
   User        User    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,7 +87,7 @@ model Task {
 
 
 model User {
-  id          Int           @id @default(autoincrement())
+  id          String      @id @default(uuid()) @db.Uuid
   name        String
   surname     String
   email       String        @unique
@@ -102,8 +102,8 @@ model User {
 }
 
 model UserProfile {
-  userId    Int
-  profileId Int
+  userId    String  @db.Uuid 
+  profileId String  @db.Uuid
   Profile   Profile @relation(fields: [profileId], references: [id])
   User      User    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())

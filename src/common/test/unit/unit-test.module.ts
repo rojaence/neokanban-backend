@@ -6,6 +6,8 @@ import { PrismaService } from '@src/database/prisma/prisma.service';
 import { MockPrismaService } from '@src/database/mocks/prismaClient/mockPrisma.service';
 import { JwtService } from '@src/modules/auth/services/jwt/jwt.service';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
+import { MongoService } from '@src/database/mongo/mongo.service';
+import { MockMongoService } from '@src/database/mocks/mongo-client/mock-mongo.service';
 
 export class BaseUnitTestModule {
   static forRoot(): DynamicModule {
@@ -30,6 +32,10 @@ export class BaseUnitTestModule {
           provide: PrismaService,
           useClass: MockPrismaService,
         },
+        {
+          provide: MongoService,
+          useClass: MockMongoService,
+        },
         BcryptService,
         JwtService,
       ],
@@ -39,6 +45,7 @@ export class BaseUnitTestModule {
         PrismaService,
         BcryptService,
         JwtService,
+        MongoService,
       ],
     };
   }

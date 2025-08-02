@@ -2,6 +2,7 @@
   "httpMessages": {
     "success": "Process executed successfully",
     "resourceNotFound": "The requested resource was not found",
-    "badRequest": "Validation errors"
+    "badRequest": "Validation errors",
+    "internalServerError": "Internal error"
   }
 }

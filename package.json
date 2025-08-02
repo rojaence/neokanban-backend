@@ -34,6 +34,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "6.18",
     "nestjs-i18n": "^10.5.1",
     "prisma": "^6.11.1",
     "reflect-metadata": "^0.2.2",

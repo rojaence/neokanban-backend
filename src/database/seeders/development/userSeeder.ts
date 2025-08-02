@@ -24,7 +24,6 @@ async function main() {
       surname: adminData.surname,
       username: 'ronnye',
       password,
-      createdAt: new Date(),
     },
   });
 }

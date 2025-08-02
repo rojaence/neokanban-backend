@@ -4,6 +4,8 @@ import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
 import { JwtService } from '../jwt/jwt.service';
+import { JwtBlacklistCreateDTO } from '../../models/jwt-blacklist.interface';
+import { JwtBlacklistRepository } from '../../repositories/jwt-blacklist.repository';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +14,7 @@ export class AuthService {
     private readonly bcryptService: BcryptService,
     private readonly translation: TranslationService,
     private readonly jwtService: JwtService,
+    private readonly jwtBlacklistRepository: JwtBlacklistRepository,
   ) {}
 
   async login(credentials: LoginDto) {
@@ -35,6 +38,7 @@ export class AuthService {
     const token = this.jwtService.generateToken({
       roleId: 1,
       username: user.username,
+      userId: user.id,
     });
     return token;
   }
@@ -44,5 +48,10 @@ export class AuthService {
     if (!user)
       throw new UnauthorizedException(this.translation.t('auth.userNotFound'));
     return user;
+  }
+
+  async logout(payload: JwtBlacklistCreateDTO) {
+    const doc = await this.jwtBlacklistRepository.create(payload);
+    return doc;
   }
 }

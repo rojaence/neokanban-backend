@@ -5,9 +5,16 @@ import { CommonModule } from '@src/common/common.module';
 import { JwtService } from './services/jwt/jwt.service';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { AuthController } from './controllers/auth/auth.controller';
+import { JwtBlacklistRepository } from './repositories/jwt-blacklist.repository';
 
 @Module({
-  providers: [AuthService, AuthRepository, BcryptService, JwtService],
+  providers: [
+    AuthService,
+    AuthRepository,
+    BcryptService,
+    JwtService,
+    JwtBlacklistRepository,
+  ],
   imports: [CommonModule],
   controllers: [AuthController],
 })
