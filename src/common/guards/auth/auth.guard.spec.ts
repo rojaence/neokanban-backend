@@ -5,35 +5,40 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BaseUnitTestModule } from '@src/common/test/unit/unit-test.module';
 import { UnitTestUtils } from '@src/common/test/unit/unit-test.utils';
 import { fakeAdminUser } from '@src/test/fakes/user';
+import { JwtBlacklistRepository } from '@src/modules/auth/repositories/jwt-blacklist.repository';
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
   let translation: TranslationService;
   let jwt: JwtService;
+  let blacklist: JwtBlacklistRepository;
   const userData = fakeAdminUser;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      providers: [JwtBlacklistRepository],
       imports: [BaseUnitTestModule.forRoot()],
     }).compile();
 
     translation = module.get<TranslationService>(TranslationService);
     jwt = module.get<JwtService>(JwtService);
-    authGuard = new AuthGuard(jwt, translation);
+    blacklist = module.get<JwtBlacklistRepository>(JwtBlacklistRepository);
+
+    authGuard = new AuthGuard(jwt, translation, blacklist);
   });
 
   it('should be defined', () => {
     expect(authGuard).toBeDefined();
   });
 
-  it('should return true if valid credentials', () => {
+  it('should return true if valid credentials', async () => {
     const token = jwt.generateToken({
       roleId: 1,
       username: userData.username,
       userId: userData.id,
     });
     const context = UnitTestUtils.createMockContext(token);
-    const valid = authGuard.canActivate(context);
+    const valid = await authGuard.canActivate(context);
     expect(valid).toBe(true);
   });
 
@@ -69,7 +74,7 @@ describe('AuthGuard', () => {
     await expect(loginFunction).rejects.toThrow(errorMessage);
   });
 
-  it('should return true with valid alternative header authorization', () => {
+  it('should return true with valid alternative header authorization', async () => {
     const token = jwt.generateToken(
       {
         roleId: 1,
@@ -79,7 +84,7 @@ describe('AuthGuard', () => {
       { expiresIn: 1 },
     );
     const context = UnitTestUtils.createMockContext(token, false);
-    const valid = authGuard.canActivate(context);
+    const valid = await authGuard.canActivate(context);
     expect(valid).toBe(true);
   });
 });

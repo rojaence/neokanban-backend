@@ -17,7 +17,6 @@ import { AuthGuard } from '@src/common/guards/auth/auth.guard';
 import { User } from '@src/common/decorators/user/user.decorator';
 import { IJwtPayload } from '../../models/auth.interface';
 import { CredentialsEnum } from '@src/common/constants/auth';
-import { randomUUID } from 'crypto';
 import { JwtRevokeReason } from '../../models/jwt-blacklist.interface';
 
 @Controller('auth')
@@ -80,7 +79,7 @@ export class AuthController {
 
     await this.authService.logout({
       exp: new Date(user.exp! * 1000),
-      jti: randomUUID(),
+      jti: user.jti!,
       revokedAt: new Date(),
       userId: user.userId,
       reason: JwtRevokeReason.LOGOUT,

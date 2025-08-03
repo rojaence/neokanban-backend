@@ -87,4 +87,36 @@ describe('AuthController (e2e)', () => {
     const profile = await request(testApp.getHttpServer()).get('/auth/profile');
     expect(profile.status).toBe(HttpStatus.UNAUTHORIZED);
   });
+
+  it('/ (POST) should save token in blacklist when logout', async () => {
+    const res = await request(testApp.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: userData.username,
+        password: defaultFakePassword,
+      });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('data');
+    expect(res.body.data).toHaveProperty('token');
+    expect(typeof res.body.data.token).toBe('string');
+    expect(res.headers['set-cookie']).toBeDefined();
+
+    const cookies = res.headers['set-cookie'];
+
+    const logout = await request(testApp.getHttpServer())
+      .post('/auth/logout')
+      .set('Cookie', cookies);
+    expect(logout.status).toBe(200);
+
+    const profile = await request(testApp.getHttpServer()).get('/auth/profile');
+    expect(profile.status).toBe(HttpStatus.UNAUTHORIZED);
+
+    const token = res.body.data.token as string;
+
+    const blacklist = await request(testApp.getHttpServer())
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(blacklist.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
 });

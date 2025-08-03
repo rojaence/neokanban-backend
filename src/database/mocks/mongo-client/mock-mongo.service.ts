@@ -9,6 +9,7 @@ export class MockMongoService {
   db: DeepMockProxy<Record<CollectionNameType, Collection<Document>>>;
   constructor() {
     this.db = mockDeep<Record<CollectionNameType, Collection<Document>>>();
+
     this.initializeDbMock();
   }
 
@@ -16,18 +17,29 @@ export class MockMongoService {
     const collections: CollectionNameType[] = ['sec_jwt_blacklist'];
     for (const name of collections) {
       const collection = mockDeep<Collection<Document>>();
-      collection.insertOne.mockImplementation(
-        async (doc: OptionalId<Document>): Promise<InsertOneResult> => {
-          const inserted = { _id: new ObjectId(), ...doc };
-          await UnitTestUtils.sleepTest(100);
-          return {
-            acknowledged: true,
-            insertedId: inserted._id,
-          };
-        },
-      );
+      switch (name) {
+        case 'sec_jwt_blacklist':
+          this.addJwtBlacklistImplementations(collection);
+          break;
+      }
       this.db[name] = collection;
     }
+  }
+
+  addJwtBlacklistImplementations(
+    collection: DeepMockProxy<Collection<Document>>,
+  ) {
+    collection.insertOne.mockImplementation(
+      async (doc: OptionalId<Document>): Promise<InsertOneResult> => {
+        const inserted = { _id: new ObjectId(), ...doc };
+        await UnitTestUtils.sleepTest(100);
+        return {
+          acknowledged: true,
+          insertedId: inserted._id,
+        };
+      },
+    );
+    collection.findOne.mockResolvedValue(null);
   }
 
   collection<T extends Document = Document>(

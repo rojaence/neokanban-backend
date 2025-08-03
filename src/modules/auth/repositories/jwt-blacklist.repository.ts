@@ -20,4 +20,9 @@ export class JwtBlacklistRepository {
       ...payload,
     };
   }
+
+  async findInBlacklist(jti: string) {
+    const result = await this.collection.findOne({ jti });
+    return result;
+  }
 }

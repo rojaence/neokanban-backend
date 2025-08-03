@@ -6,6 +6,7 @@ import { TranslationService } from '@src/common/helpers/i18n-translation';
 import { JwtService } from '../jwt/jwt.service';
 import { JwtBlacklistCreateDTO } from '../../models/jwt-blacklist.interface';
 import { JwtBlacklistRepository } from '../../repositories/jwt-blacklist.repository';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class AuthService {
@@ -39,6 +40,7 @@ export class AuthService {
       roleId: 1,
       username: user.username,
       userId: user.id,
+      jti: randomUUID(),
     });
     return token;
   }

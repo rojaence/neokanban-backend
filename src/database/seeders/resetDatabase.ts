@@ -1,16 +1,21 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { PrismaClient } from '@prisma/client';
+import { MongoClient } from 'mongodb';
 
 const execPromise = promisify(exec);
 
-async function resetDatabase(prisma: PrismaClient) {
+async function resetDatabase(prisma: PrismaClient, mongo: MongoClient) {
   try {
     console.log('Resetting database...');
 
-    // Detener Prisma Client
-    await prisma.$disconnect();
+    // Reiniciar base de datos de mongo
 
+    const collections = await mongo.db().collections();
+    for (const collection of collections) {
+      await collection.deleteMany({});
+    }
+    await mongo.close();
     // Ejecutar el comando de reset de Prisma
     const { stderr } = await execPromise('npx prisma migrate reset --force');
     if (stderr) {

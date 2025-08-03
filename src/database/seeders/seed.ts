@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { parseArgs } from 'node:util';
 import userSeeder from '../seeders/development/userSeeder';
 import resetDatabase from '../seeders/resetDatabase';
+import { MongoClient } from 'mongodb';
 
 const options = {
   environment: { type: 'string' as const },
@@ -17,12 +18,14 @@ const prisma = new PrismaClient({
   },
 });
 
+const mongo = new MongoClient(env.MONGO_DATABASE_URL);
+
 async function main() {
   const {
     values: { reset },
   } = parseArgs({ options });
   if (reset) {
-    await resetDatabase(prisma);
+    await resetDatabase(prisma, mongo);
   }
 
   const environment = process.env.NODE_ENV;
