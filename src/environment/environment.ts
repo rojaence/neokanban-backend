@@ -27,6 +27,7 @@ export interface EnvironmentConfigI {
   USER_DEFAULT_PASSWORD: string;
   DATABASE_URL: string;
   MONGO_DATABASE_URL: string;
+  DEFAULT_LANGUAGE: string;
 }
 
 const environment: EnvironmentConfigI = {
@@ -35,6 +36,7 @@ const environment: EnvironmentConfigI = {
   JWT_EXPIRATION: Number(process.env.JWT_EXPIRATION || '3600'),
   DATABASE_URL: String(process.env.DATABASE_URL || ''),
   MONGO_DATABASE_URL: String(process.env.MONGO_DATABASE_URL || ''),
+  DEFAULT_LANGUAGE: String(process.env.DEFAULT_LANGUAGE || 'es'),
 };
 
 export default environment;

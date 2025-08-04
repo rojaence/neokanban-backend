@@ -8,6 +8,10 @@ export type I18nTranslations = {
     "auth": {
         "invalidCredentials": string;
         "userNotFound": string;
+        "otp": {
+            "alreadySent": string;
+            "notFound": string;
+        };
     };
     "validation": {
         "httpMessages": {

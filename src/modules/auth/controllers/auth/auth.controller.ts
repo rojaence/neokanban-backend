@@ -18,11 +18,14 @@ import { User } from '@src/common/decorators/user/user.decorator';
 import { IJwtPayload } from '../../models/auth.interface';
 import { CredentialsEnum } from '@src/common/constants/auth';
 import { JwtRevokeReason } from '../../models/jwt-blacklist.interface';
+import { OtpService } from '../../services/otp/otp.service';
+import { OtpVerifyCodeDTO } from '../../models/otp.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly otpService: OtpService,
     private readonly translation: TranslationService,
   ) {}
 
@@ -92,4 +95,41 @@ export class AuthController {
 
     response.status(HttpStatus.OK).json(result);
   }
+
+  @Post('/otp/generate')
+  @UseGuards(AuthGuard)
+  async generateOtp(@User() user: IJwtPayload) {
+    const code = await this.otpService.generateCode(user.userId);
+    return HttpResponse.success({
+      statusCode: HttpStatus.OK,
+      message: this.translation.t('validation.httpMessages.success') as string,
+      data: { code },
+    });
+  }
+
+  @Post('/otp/verify')
+  @UseGuards(AuthGuard)
+  async verifyOtp(
+    @User() user: IJwtPayload,
+    @Body() payload: OtpVerifyCodeDTO,
+  ) {
+    const verified = await this.otpService.verifyCode({
+      code: payload.code,
+      userId: user.userId,
+    });
+
+    // TODO: Iniciar proceso de refresh password para coleccion otp_process
+    return HttpResponse.success({
+      statusCode: HttpStatus.OK,
+      message: this.translation.t('validation.httpMessages.success') as string,
+      data: { verified },
+    });
+  }
+
+  // Obtener el proceso de otp activo
+  // @GET('/otp/status')
+  // @UseGuards(AuthGuard)
+  // async getActiveOtp(@User() user: IJwtPayload) {
+
+  // }
 }
