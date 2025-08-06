@@ -1,7 +1,7 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { I18nPath } from '@src/generated/i18n.generated';
 import { I18nService, TranslateOptions } from 'nestjs-i18n';
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class TranslationService {
   constructor(private readonly i18n: I18nService) {}
 

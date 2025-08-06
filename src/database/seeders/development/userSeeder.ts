@@ -1,3 +1,4 @@
+import '../../../environment/setup-env';
 import env from '../../../environment/environment';
 import { BcryptService } from '../../../common/services/bcrypt/bcrypt.service';
 import { PrismaClient } from '@prisma/client';

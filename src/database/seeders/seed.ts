@@ -1,3 +1,4 @@
+import '../../environment/setup-env';
 import env from '../../environment/environment';
 import { PrismaClient } from '@prisma/client';
 import { parseArgs } from 'node:util';

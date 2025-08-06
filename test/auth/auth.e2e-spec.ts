@@ -119,8 +119,4 @@ describe('AuthController (e2e)', () => {
 
     expect(blacklist.status).toBe(HttpStatus.UNAUTHORIZED);
   });
-
-  it('/ (POST) should generate a otp code user request', async () => {
-    // TODO: Completar test de genreracion de otp
-  });
 });

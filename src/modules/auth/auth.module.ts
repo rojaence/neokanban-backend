@@ -8,6 +8,7 @@ import { AuthController } from './controllers/auth/auth.controller';
 import { JwtBlacklistRepository } from './repositories/jwt-blacklist.repository';
 import { OtpRepository } from './repositories/otp.repository';
 import { OtpService } from './services/otp/otp.service';
+import { OtpController } from './controllers/otp/otp.controller';
 
 @Module({
   providers: [
@@ -20,6 +21,6 @@ import { OtpService } from './services/otp/otp.service';
     OtpService,
   ],
   imports: [CommonModule],
-  controllers: [AuthController],
+  controllers: [AuthController, OtpController],
 })
 export class AuthModule {}

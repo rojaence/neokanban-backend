@@ -6,6 +6,7 @@
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "setupFiles": ["<rootDir>/src/environment/setup-env.ts"],
   "moduleNameMapper": {
     "@src/(.*)": "<rootDir>/src/$1",
     "@auth/(.*)": "<rootDir>/src/modules/auth/$1",

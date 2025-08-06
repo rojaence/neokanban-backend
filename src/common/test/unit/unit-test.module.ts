@@ -8,6 +8,7 @@ import { JwtService } from '@src/modules/auth/services/jwt/jwt.service';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { MongoService } from '@src/database/mongo/mongo.service';
 import { MockMongoService } from '@src/database/mocks/mongo-client/mock-mongo.service';
+import { DateService } from '@src/common/services/date/date.service';
 
 export class BaseUnitTestModule {
   static forRoot(): DynamicModule {
@@ -38,6 +39,7 @@ export class BaseUnitTestModule {
         },
         BcryptService,
         JwtService,
+        DateService,
       ],
       exports: [
         I18nModule,
@@ -46,6 +48,7 @@ export class BaseUnitTestModule {
         BcryptService,
         JwtService,
         MongoService,
+        DateService,
       ],
     };
   }
