@@ -13,6 +13,7 @@ import {
   OtpProcess,
   OtpProcessEnum,
   OtpProcessStatusEnum,
+  OtpStatusCodeType,
   OtpVerifyCodeType,
 } from '@auth/models/otp.interface';
 
@@ -25,7 +26,7 @@ export class OtpService {
     private readonly translation: TranslationService,
   ) {}
   async generateCode(userId: string, processType: OtpProcessEnum) {
-    const exists = await this.otpRepository.findActive(userId);
+    const exists = await this.otpRepository.findActive({ userId, processType });
     if (exists) {
       throw new BadRequestException(this.translation.t('auth.otp.alreadySent'));
     }
@@ -50,7 +51,7 @@ export class OtpService {
   }
 
   async verifyCode(payload: OtpVerifyCodeType) {
-    const exists = await this.otpRepository.findActive(payload.userId);
+    const exists = await this.otpRepository.findActive(payload);
     if (!exists)
       throw new NotFoundException(this.translation.t('auth.otp.notFound'));
     const verify = await this.bcryptService.chechPasswordHash(
@@ -63,10 +64,11 @@ export class OtpService {
     return true;
   }
 
-  async getActiveCode(payload: OtpVerifyCodeType) {
-    const exists = await this.otpRepository.findActive(payload.userId);
+  async statusActiveCode(payload: OtpStatusCodeType) {
+    const exists = await this.otpRepository.findActive(payload);
     if (!exists)
       throw new NotFoundException(this.translation.t('auth.otp.notFound'));
-    return exists;
+    const expired = this.dateService.isBefore(exists.exp, new Date());
+    return expired;
   }
 }

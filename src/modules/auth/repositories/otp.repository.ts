@@ -4,6 +4,7 @@ import {
   OtpCodeCreateDTO,
   OtpProcess as OtpProcess,
   OtpProcessCreateDTO,
+  OtpStatusCodeType,
   OtpVerifyCodeType,
 } from '../models/otp.interface';
 import { MongoService } from '@src/database/mongo/mongo.service';
@@ -37,11 +38,8 @@ export class OtpRepository {
     };
   }
 
-  async findActive(userId: string) {
-    const result = await this.codes.findOne({
-      userId,
-      revokedAt: null,
-    });
+  async findActive(filter: OtpStatusCodeType) {
+    const result = await this.codes.findOne({ ...filter, revokedAt: null });
     return result;
   }
 

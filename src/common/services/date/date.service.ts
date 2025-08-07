@@ -3,8 +3,10 @@ import { DateTime } from 'luxon';
 
 @Injectable()
 export class DateService {
-  private parse(date: Date) {
-    return DateTime.fromJSDate(date);
+  private parse(date: Date | string) {
+    return typeof date === 'string'
+      ? DateTime.fromISO(date)
+      : DateTime.fromJSDate(date);
   }
 
   getNow(zone = 'UTC') {
@@ -20,5 +22,9 @@ export class DateService {
     format: Intl.DateTimeFormatOptions = DateTime.DATETIME_MED,
   ) {
     return this.parse(date).toLocaleString(format);
+  }
+
+  isBefore(dateA: Date, dateB: Date): boolean {
+    return this.parse(dateA) < this.parse(dateB);
   }
 }

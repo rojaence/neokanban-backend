@@ -9,7 +9,6 @@ export class MongoService implements OnModuleDestroy, OnModuleInit {
   private db: Db;
 
   async onModuleInit() {
-    console.log('🚀 ~ environment:', environment);
     this.client = new MongoClient(environment.MONGO_DATABASE_URL);
     await this.client.connect();
     this.db = this.client.db();

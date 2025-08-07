@@ -12,6 +12,7 @@ import { HttpResponse } from '@src/common/helpers/http-response';
 import { IJwtPayload } from '../../models/auth.interface';
 import {
   OtpGenerateCodeDTO,
+  OtpStatusCodeDTO,
   OtpVerifyCodeDTO,
 } from '../../models/otp.interface';
 import { OtpService } from '../../services/otp/otp.service';
@@ -51,6 +52,7 @@ export class OtpController {
     const verified = await this.otpService.verifyCode({
       code: payload.code,
       userId: user.userId,
+      processType: payload.processType,
     });
 
     return HttpResponse.success({
@@ -60,10 +62,21 @@ export class OtpController {
     });
   }
 
-  // Obtener el proceso de otp activo
-  // @GET('/otp/status')
-  // @UseGuards(AuthGuard)
-  // async getActiveOtp(@User() user: IJwtPayload) {
-
-  // }
+  @Post('/status')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  async getActiveOtp(
+    @User() user: IJwtPayload,
+    @Body() payload: OtpStatusCodeDTO,
+  ) {
+    const status = await this.otpService.statusActiveCode({
+      userId: user.userId,
+      processType: payload.processType,
+    });
+    return HttpResponse.success({
+      statusCode: HttpStatus.OK,
+      message: this.translation.t('validation.httpMessages.success') as string,
+      data: { expired: status },
+    });
+  }
 }

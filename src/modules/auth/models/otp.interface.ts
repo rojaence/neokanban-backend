@@ -47,9 +47,21 @@ export class OtpGenerateCodeDTO {
   processType: OtpProcessEnum;
 }
 
+export class OtpStatusCodeDTO {
+  @IsNotEmpty()
+  @IsEnum(OtpProcessEnum)
+  processType: OtpProcessEnum;
+}
+
 export type OtpCodeCreateDTO = Omit<OtpCode, '_id'>;
 export type OtpProcessCreateDTO = Omit<OtpProcess, '_id'>;
 export type OtpVerifyCodeType = {
   userId: string;
   code: string;
+  processType: OtpProcessEnum;
+};
+
+export type OtpStatusCodeType = {
+  userId: string;
+  processType: OtpProcessEnum;
 };

@@ -14,6 +14,7 @@ const config: Config = {
     '^@environment/(.*)$': '<rootDir>/src/environment/$1',
     '^@test/(.*)$': '<rootDir>/src/test/$1',
   },
+  setupFiles: ['<rootDir>/src/environment/setup-env.ts'],
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
