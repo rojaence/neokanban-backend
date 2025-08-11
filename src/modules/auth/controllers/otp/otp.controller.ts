@@ -62,21 +62,21 @@ export class OtpController {
     });
   }
 
-  @Post('/status')
+  @Post('/active')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async getActiveOtp(
     @User() user: IJwtPayload,
     @Body() payload: OtpStatusCodeDTO,
   ) {
-    const status = await this.otpService.statusActiveCode({
+    const valid = await this.otpService.statusActiveProcess({
       userId: user.userId,
       processType: payload.processType,
     });
     return HttpResponse.success({
       statusCode: HttpStatus.OK,
       message: this.translation.t('validation.httpMessages.success') as string,
-      data: { expired: status },
+      data: { valid },
     });
   }
 }

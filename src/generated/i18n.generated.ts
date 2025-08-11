@@ -10,7 +10,8 @@ export type I18nTranslations = {
         "userNotFound": string;
         "otp": {
             "alreadySent": string;
-            "notFound": string;
+            "invalid": string;
+            "invalidProcess": string;
         };
     };
     "validation": {

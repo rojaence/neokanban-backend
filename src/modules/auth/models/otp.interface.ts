@@ -11,6 +11,7 @@ export enum OtpProcessEnum {
 
 export enum OtpProcessStatusEnum {
   PENDING = 'pending',
+  VERIFIED = 'verified',
   FINISHED = 'finished',
 }
 
@@ -19,6 +20,7 @@ export interface OtpCode {
   userId: string;
   code: string;
   revokedAt: Date | null;
+  processType: OtpProcessEnum;
   exp: Date;
   reason?: string;
 }
@@ -28,6 +30,7 @@ export interface OtpProcess {
   userId: string;
   status: OtpProcessStatusEnum;
   processType: OtpProcessEnum;
+  codeId: ObjectId;
   exp: Date;
 }
 
@@ -54,7 +57,9 @@ export class OtpStatusCodeDTO {
 }
 
 export type OtpCodeCreateDTO = Omit<OtpCode, '_id'>;
-export type OtpProcessCreateDTO = Omit<OtpProcess, '_id'>;
+export type OtpProcessCreateDTO = Omit<OtpProcess, '_id'> & {
+  codeId: ObjectId;
+};
 export type OtpVerifyCodeType = {
   userId: string;
   code: string;
@@ -64,4 +69,10 @@ export type OtpVerifyCodeType = {
 export type OtpStatusCodeType = {
   userId: string;
   processType: OtpProcessEnum;
+};
+
+export type OtpStatusProcessType = {
+  userId: string;
+  processType: OtpProcessEnum;
+  codeId: ObjectId;
 };

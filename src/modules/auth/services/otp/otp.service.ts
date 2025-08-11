@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OtpRepository } from '@auth/repositories/otp.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { randomInt } from 'crypto';
@@ -26,7 +22,10 @@ export class OtpService {
     private readonly translation: TranslationService,
   ) {}
   async generateCode(userId: string, processType: OtpProcessEnum) {
-    const exists = await this.otpRepository.findActive({ userId, processType });
+    const exists = await this.otpRepository.findActiveCode({
+      userId,
+      processType,
+    });
     if (exists) {
       throw new BadRequestException(this.translation.t('auth.otp.alreadySent'));
     }
@@ -36,39 +35,59 @@ export class OtpService {
     const payload: OtpCode = {
       userId,
       code,
+      processType,
       revokedAt: null,
       exp,
     };
+    const otpDoc = await this.otpRepository.saveCode(payload);
     const process: OtpProcess = {
       userId,
       status: OtpProcessStatusEnum.PENDING,
       processType,
+      codeId: otpDoc._id!,
       exp: this.dateService.addMinutes(new Date(), 5),
     };
-    await this.otpRepository.saveCode(payload);
     await this.otpRepository.saveProcess(process);
     return otp;
   }
 
   async verifyCode(payload: OtpVerifyCodeType) {
-    const exists = await this.otpRepository.findActive(payload);
-    if (!exists)
-      throw new NotFoundException(this.translation.t('auth.otp.notFound'));
+    const exists = await this.otpRepository.findActiveCode(payload);
+    if (!exists) {
+      throw new BadRequestException(this.translation.t('auth.otp.invalid'));
+    }
     const verify = await this.bcryptService.chechPasswordHash(
       payload.code,
       exists.code,
     );
     if (!verify)
-      throw new BadRequestException(this.translation.t('auth.otp.notFound'));
-    await this.otpRepository.revoke(payload);
+      throw new BadRequestException(this.translation.t('auth.otp.invalid'));
+    const process = await this.otpRepository.findActiveProcess({
+      codeId: exists._id,
+      processType: exists.processType,
+      userId: exists.userId,
+    });
+    await this.otpRepository.setActiveProcessStatus(
+      process!._id,
+      OtpProcessStatusEnum.VERIFIED,
+    );
+    await this.otpRepository.revokeCode(exists._id);
     return true;
   }
 
-  async statusActiveCode(payload: OtpStatusCodeType) {
-    const exists = await this.otpRepository.findActive(payload);
+  async statusActiveProcess(payload: OtpStatusCodeType) {
+    const exists = await this.otpRepository.findVerifiedProcess(payload);
     if (!exists)
-      throw new NotFoundException(this.translation.t('auth.otp.notFound'));
-    const expired = this.dateService.isBefore(exists.exp, new Date());
-    return expired;
+      throw new BadRequestException(
+        this.translation.t('auth.otp.invalidProcess'),
+      );
+    console.log(exists.exp);
+    console.log(new Date());
+    const valid = this.dateService.isBefore(new Date(), exists.exp);
+    if (!valid)
+      throw new BadRequestException(
+        this.translation.t('auth.otp.invalidProcess'),
+      );
+    return valid;
   }
 }
