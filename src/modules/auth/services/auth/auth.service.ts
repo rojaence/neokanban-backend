@@ -46,7 +46,7 @@ export class AuthService {
   }
 
   async profile(username: string) {
-    const user = await this.authRepository.findUserByUsername(username);
+    const user = await this.authRepository.findUserProfileByUsername(username);
     if (!user)
       throw new UnauthorizedException(this.translation.t('auth.userNotFound'));
     return user;

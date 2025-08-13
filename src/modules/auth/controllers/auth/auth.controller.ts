@@ -19,6 +19,13 @@ import { IJwtPayload } from '../../models/auth.interface';
 import { CredentialsEnum } from '@src/common/constants/auth';
 import { JwtRevokeReason } from '../../models/jwt-blacklist.interface';
 import { OtpService } from '../../services/otp/otp.service';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +35,9 @@ export class AuthController {
     private readonly translation: TranslationService,
   ) {}
 
+  @ApiOperation({ summary: 'Login with user credentials' })
+  @ApiOkResponse({ description: 'Return an access token' })
+  @ApiBadRequestResponse({ description: 'Invalid Credentials' })
   @Post('/login')
   async login(
     @Body() credentials: LoginDto,
@@ -54,6 +64,10 @@ export class AuthController {
   }
 
   @Get('/profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get a user authenticated profile' })
+  @ApiOkResponse({ description: 'Return user profile data' })
+  @ApiNotFoundResponse({ description: 'Not found profile data' })
   @UseGuards(AuthGuard)
   async profile(@User() user: IJwtPayload) {
     const userProfile = await this.authService.profile(user.username);
@@ -67,6 +81,9 @@ export class AuthController {
   }
 
   @Post('/logout')
+  @ApiOperation({ summary: 'Logout user' })
+  @ApiOkResponse()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async logout(
     @User() user: IJwtPayload,
