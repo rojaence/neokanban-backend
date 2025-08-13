@@ -26,6 +26,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.11.1",
     "@types/cookie-parser": "^1.4.9",
     "@types/luxon": "^3.7.1",

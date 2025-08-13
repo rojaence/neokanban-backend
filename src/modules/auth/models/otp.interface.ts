@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
@@ -35,22 +36,26 @@ export interface OtpProcess {
 }
 
 export class OtpVerifyCodeDTO {
+  @ApiProperty({ example: '123456' })
   @IsString()
   @IsNotEmpty()
   @Length(6)
   code: string;
   @IsNotEmpty()
+  @ApiProperty({ example: 'change_password' })
   @IsEnum(OtpProcessEnum)
   processType: OtpProcessEnum;
 }
 
 export class OtpGenerateCodeDTO {
+  @ApiProperty({ example: 'change_password' })
   @IsNotEmpty()
   @IsEnum(OtpProcessEnum)
   processType: OtpProcessEnum;
 }
 
 export class OtpStatusCodeDTO {
+  @ApiProperty({ example: 'change_password' })
   @IsNotEmpty()
   @IsEnum(OtpProcessEnum)
   processType: OtpProcessEnum;
