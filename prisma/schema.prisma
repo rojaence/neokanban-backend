@@ -13,7 +13,7 @@ model Action {
   id            String      @id @default(uuid()) @db.Uuid
   name          String          @unique
   description   String?
-  ProfileOption ProfileOption[]
+  profileOptions ProfileOption[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_actions")
@@ -25,7 +25,7 @@ model Module {
   name        String
   description String?
   uri         String   @default("")
-  Option      Option[]
+  options      Option[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_modules")
@@ -39,8 +39,8 @@ model Option {
   id            String      @id @default(uuid()) @db.Uuid
   iconName      String?
   uri           String          @default("")
-  Module        Module          @relation(fields: [moduleId], references: [id])
-  ProfileOption ProfileOption[]
+  module        Module          @relation(fields: [moduleId], references: [id])
+  profileOptions ProfileOption[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_options")
@@ -51,8 +51,8 @@ model Profile {
   id            String      @id @default(uuid()) @db.Uuid
   name          String          @unique
   description   String?
-  ProfileOption ProfileOption[]
-  UserProfile   UserProfile[]
+  profileOptions ProfileOption[]
+  userProfiles   UserProfile[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_profiles")
@@ -64,9 +64,9 @@ model ProfileOption {
   actionId  String      @db.Uuid
   id        String      @id @default(uuid()) @db.Uuid
   optionId  String      @db.Uuid
-  Action    Action  @relation(fields: [actionId], references: [id])
-  Option    Option  @relation(fields: [optionId], references: [id])
-  Profile   Profile @relation(fields: [profileId], references: [id])
+  action    Action  @relation(fields: [actionId], references: [id])
+  option    Option  @relation(fields: [optionId], references: [id])
+  profile   Profile @relation(fields: [profileId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_profile_options")
@@ -78,7 +78,7 @@ model Task {
   title       String
   description String?
   userId      String      @db.Uuid
-  User        User    @relation(fields: [userId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("man_tasks")
@@ -93,8 +93,8 @@ model User {
   email       String        @unique
   password    String
   username    String        @unique
-  Task        Task[]
-  UserProfile UserProfile[]
+  tasks        Task[]
+  userProfiles UserProfile[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_users")
@@ -104,8 +104,8 @@ model User {
 model UserProfile {
   userId    String  @db.Uuid 
   profileId String  @db.Uuid
-  Profile   Profile @relation(fields: [profileId], references: [id])
-  User      User    @relation(fields: [userId], references: [id])
+  profile   Profile @relation(fields: [profileId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

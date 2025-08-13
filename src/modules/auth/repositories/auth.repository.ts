@@ -9,7 +9,7 @@ export class AuthRepository {
     return await this.prisma.user.findUnique({
       where: { username },
       include: {
-        UserProfile: true,
+        userProfiles: true,
       },
     });
   }
@@ -19,7 +19,7 @@ export class AuthRepository {
       omit: { password: true },
       where: { username },
       include: {
-        UserProfile: true,
+        userProfiles: true,
       },
     });
   }
