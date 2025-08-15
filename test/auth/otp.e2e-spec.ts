@@ -17,7 +17,7 @@ interface GenerateOtpResponse {
 
 interface TokenResponse {
   data: {
-    token: string;
+    accessToken: string;
   };
 }
 
@@ -56,7 +56,7 @@ describe('OtpController (e2e)', () => {
         password: defaultFakePassword,
       });
     const body = res.body as TokenResponse;
-    token = body.data.token;
+    token = body.data.accessToken;
   });
 
   it('/ (POST) should generate a otp and verify', async () => {

@@ -55,7 +55,7 @@ export class AuthController {
     const result = HttpResponse.success({
       statusCode: HttpStatus.OK,
       data: {
-        token,
+        accessToken: token,
       },
       message: this.translation.t('validation.httpMessages.success') as string,
     });

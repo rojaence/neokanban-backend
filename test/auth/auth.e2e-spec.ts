@@ -38,8 +38,8 @@ describe('AuthController (e2e)', () => {
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('token');
-    expect(typeof res.body.data.token).toBe('string');
+    expect(res.body.data).toHaveProperty('accessToken');
+    expect(typeof res.body.data.accessToken).toBe('string');
     expect(res.headers['set-cookie']).toBeDefined();
   });
 
@@ -73,8 +73,8 @@ describe('AuthController (e2e)', () => {
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('token');
-    expect(typeof res.body.data.token).toBe('string');
+    expect(res.body.data).toHaveProperty('accessToken');
+    expect(typeof res.body.data.accessToken).toBe('string');
     expect(res.headers['set-cookie']).toBeDefined();
 
     const cookies = res.headers['set-cookie'];
@@ -97,8 +97,8 @@ describe('AuthController (e2e)', () => {
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('data');
-    expect(res.body.data).toHaveProperty('token');
-    expect(typeof res.body.data.token).toBe('string');
+    expect(res.body.data).toHaveProperty('accessToken');
+    expect(typeof res.body.data.accessToken).toBe('string');
     expect(res.headers['set-cookie']).toBeDefined();
 
     const cookies = res.headers['set-cookie'];
@@ -111,7 +111,7 @@ describe('AuthController (e2e)', () => {
     const profile = await request(testApp.getHttpServer()).get('/auth/profile');
     expect(profile.status).toBe(HttpStatus.UNAUTHORIZED);
 
-    const token = res.body.data.token as string;
+    const token = res.body.data.accessToken as string;
 
     const blacklist = await request(testApp.getHttpServer())
       .get('/auth/profile')
