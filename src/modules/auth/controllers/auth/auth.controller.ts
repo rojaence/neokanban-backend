@@ -48,7 +48,7 @@ export class AuthController {
     response.cookie(CredentialsEnum.tokenKey, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: environment.JWT_EXPIRATION,
+      maxAge: environment.COOKIE_EXPIRATION,
       sameSite: 'lax',
     });
 

@@ -8,7 +8,7 @@ export class JwtService {
   private secretKey = environment.JWT_SECRET ?? 'default';
 
   generateToken(data: IJwtPayload, options?: Partial<SignOptions>) {
-    const expiresIn = environment.JWT_EXPIRATION;
+    const expiresIn = environment.JWT_EXPIRATION as SignOptions['expiresIn'];
     let jwtOptions: Partial<SignOptions> = {};
     const payload = {
       ...data,
