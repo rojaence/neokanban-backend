@@ -9,6 +9,7 @@ import { JwtBlacklistRepository } from './repositories/jwt-blacklist.repository'
 import { OtpRepository } from './repositories/otp.repository';
 import { OtpService } from './services/otp/otp.service';
 import { OtpController } from './controllers/otp/otp.controller';
+import { JwtWhitelistRepository } from './repositories/jwt-whitelist.repository';
 
 @Module({
   providers: [
@@ -17,6 +18,7 @@ import { OtpController } from './controllers/otp/otp.controller';
     BcryptService,
     JwtService,
     JwtBlacklistRepository,
+    JwtWhitelistRepository,
     OtpRepository,
     OtpService,
   ],

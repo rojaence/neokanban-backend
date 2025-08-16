@@ -12,11 +12,14 @@ import { MongoService } from '@src/database/mongo/mongo.service';
 import { MockMongoService } from '@src/database/mocks/mongo-client/mock-mongo.service';
 import { JwtBlacklistCreateDTO } from '../../models/jwt-blacklist.interface';
 import { fakeAdminUser, defaultFakePassword } from '@src/test/fakes/user';
+import { JwtWhitelistRepository } from '../../repositories/jwt-whitelist.repository';
 
 describe('AuthService', () => {
   let service: AuthService;
   let translationService: TranslationService;
   let jwtService: JwtService;
+  let jwtBlacklistRepository: JwtBlacklistRepository;
+  let jwtWhitelistRepository: JwtWhitelistRepository;
   const userData = fakeAdminUser;
 
   beforeEach(async () => {
@@ -28,6 +31,7 @@ describe('AuthService', () => {
         TranslationService,
         AuthRepository,
         JwtBlacklistRepository,
+        JwtWhitelistRepository,
         {
           provide: PrismaService,
           useClass: MockPrismaService,
@@ -43,6 +47,12 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     translationService = module.get<TranslationService>(TranslationService);
     jwtService = module.get<JwtService>(JwtService);
+    jwtWhitelistRepository = module.get<JwtWhitelistRepository>(
+      JwtWhitelistRepository,
+    );
+    jwtBlacklistRepository = module.get<JwtBlacklistRepository>(
+      JwtBlacklistRepository,
+    );
   });
 
   it('should be defined', () => {
@@ -85,9 +95,12 @@ describe('AuthService', () => {
       password: defaultFakePassword,
     };
     const token = await service.login(credentials);
-    const decoded = jwtService.verifyToken(token);
-    expect(typeof token).toBe('string');
+    const decoded = jwtService.verifyToken(token.accessToken);
+    const decodedRefresh = jwtService.verifyToken(token.refreshToken);
+    expect(typeof token.accessToken).toBe('string');
+    expect(typeof token.refreshToken).toBe('string');
     expect(decoded.valid).toBe(true);
+    expect(decodedRefresh.valid).toBe(true);
   });
 
   it('should return a user profile with username', async () => {
@@ -105,7 +118,7 @@ describe('AuthService', () => {
     await expect(profileFunction).rejects.toThrow(errorMessage);
   });
 
-  it('should try to save a document to jwt blacklist when logout', async () => {
+  it('should try to save documents to jwt blacklist when logout', async () => {
     const credentials = {
       username: userData.username,
       password: defaultFakePassword,
@@ -113,7 +126,7 @@ describe('AuthService', () => {
     const token = await service.login(credentials);
     expect(token).toBeDefined();
 
-    const { decoded } = jwtService.decodeToken(token);
+    const { decoded } = jwtService.decodeToken(token.accessToken);
     const payload: JwtBlacklistCreateDTO = {
       userId: decoded!.userId,
       jti: decoded!.jti!,
@@ -121,7 +134,17 @@ describe('AuthService', () => {
       exp: new Date(decoded!.exp! * 1000),
     };
     const doc = await service.logout(payload);
+    const refreshToken = jwtService.decodeToken(token.refreshToken);
+    const refreshInWhitelist = await jwtWhitelistRepository.findInWhitelist(
+      refreshToken.decoded!.jti!,
+    );
+    const refreshInBlacklist = await jwtBlacklistRepository.findInBlacklist(
+      refreshToken.decoded!.jti!,
+    );
+
     expect(doc).toBeDefined();
     expect(doc._id).toBeDefined();
+    expect(refreshInWhitelist).toBeNull();
+    expect(refreshInBlacklist).toBeDefined();
   });
 });

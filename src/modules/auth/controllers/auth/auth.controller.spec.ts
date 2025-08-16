@@ -6,6 +6,7 @@ import { AuthRepository } from '../../repositories/auth.repository';
 import { JwtBlacklistRepository } from '../../repositories/jwt-blacklist.repository';
 import { OtpService } from '../../services/otp/otp.service';
 import { OtpRepository } from '../../repositories/otp.repository';
+import { JwtWhitelistRepository } from '../../repositories/jwt-whitelist.repository';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -18,6 +19,7 @@ describe('AuthController', () => {
         AuthService,
         AuthRepository,
         JwtBlacklistRepository,
+        JwtWhitelistRepository,
         OtpService,
         OtpRepository,
       ],

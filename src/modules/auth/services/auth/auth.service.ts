@@ -4,9 +4,16 @@ import { AuthRepository } from '../../repositories/auth.repository';
 import { BcryptService } from '@src/common/services/bcrypt/bcrypt.service';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
 import { JwtService } from '../jwt/jwt.service';
-import { JwtBlacklistCreateDTO } from '../../models/jwt-blacklist.interface';
+import {
+  JwtBlacklistCreateDTO,
+  JwtRevokeReason,
+} from '../../models/jwt-blacklist.interface';
 import { JwtBlacklistRepository } from '../../repositories/jwt-blacklist.repository';
 import { randomUUID } from 'node:crypto';
+import environment from '@src/environment/environment';
+import { SignOptions } from 'jsonwebtoken';
+import { AuthAccessDto } from '../../models/auth.interface';
+import { JwtWhitelistRepository } from '../../repositories/jwt-whitelist.repository';
 
 @Injectable()
 export class AuthService {
@@ -16,9 +23,10 @@ export class AuthService {
     private readonly translation: TranslationService,
     private readonly jwtService: JwtService,
     private readonly jwtBlacklistRepository: JwtBlacklistRepository,
+    private readonly jwtWhitelistRepository: JwtWhitelistRepository,
   ) {}
 
-  async login(credentials: LoginDto) {
+  async login(credentials: LoginDto): Promise<AuthAccessDto> {
     const user = await this.authRepository.findUserByUsername(
       credentials.username,
     );
@@ -36,13 +44,41 @@ export class AuthService {
         this.translation.t('auth.invalidCredentials'),
       );
     }
-    const token = this.jwtService.generateToken({
-      roleId: 1,
+
+    const accessJti = randomUUID();
+    const refreshJti = randomUUID();
+    const accessToken = this.jwtService.generateToken({
       username: user.username,
       userId: user.id,
-      jti: randomUUID(),
+      jti: accessJti,
     });
-    return token;
+
+    const refreshToken = this.jwtService.generateToken(
+      {
+        username: user.username,
+        userId: user.id,
+        jti: refreshJti,
+      },
+      {
+        expiresIn:
+          environment.JWT_REFRESH_EXPIRATION as SignOptions['expiresIn'],
+      },
+    );
+
+    const refreshDecoded = this.jwtService.decodeToken(refreshToken);
+
+    await this.jwtWhitelistRepository.create({
+      userId: user.id,
+      jti: refreshJti,
+      pairTokenJti: accessJti,
+      exp: new Date(refreshDecoded.decoded!.exp! * 1000),
+      revokedAt: null,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   async profile(username: string) {
@@ -54,6 +90,19 @@ export class AuthService {
 
   async logout(payload: JwtBlacklistCreateDTO) {
     const doc = await this.jwtBlacklistRepository.create(payload);
+    const pairRefreshToken = await this.jwtWhitelistRepository.findInWhitelist(
+      payload.jti,
+    );
+    if (pairRefreshToken) {
+      await this.jwtWhitelistRepository.delete(pairRefreshToken._id);
+      await this.jwtBlacklistRepository.create({
+        userId: payload.userId,
+        jti: pairRefreshToken.jti,
+        revokedAt: new Date(),
+        exp: pairRefreshToken.exp,
+        reason: JwtRevokeReason.LOGOUT,
+      });
+    }
     return doc;
   }
 }

@@ -14,12 +14,18 @@ export class MockMongoService {
   }
 
   initializeDbMock() {
-    const collections: CollectionNameType[] = ['sec_jwt_blacklist'];
+    const collections: CollectionNameType[] = [
+      'sec_jwt_blacklist',
+      'sec_jwt_whitelist',
+    ];
     for (const name of collections) {
       const collection = mockDeep<Collection<Document>>();
       switch (name) {
         case 'sec_jwt_blacklist':
           this.addJwtBlacklistImplementations(collection);
+          break;
+        case 'sec_jwt_whitelist':
+          this.addJwtWhitelistImplementations(collection);
           break;
       }
       this.db[name] = collection;
@@ -27,6 +33,22 @@ export class MockMongoService {
   }
 
   addJwtBlacklistImplementations(
+    collection: DeepMockProxy<Collection<Document>>,
+  ) {
+    collection.insertOne.mockImplementation(
+      async (doc: OptionalId<Document>): Promise<InsertOneResult> => {
+        const inserted = { _id: new ObjectId(), ...doc };
+        await UnitTestUtils.sleepTest(100);
+        return {
+          acknowledged: true,
+          insertedId: inserted._id,
+        };
+      },
+    );
+    collection.findOne.mockResolvedValue(null);
+  }
+
+  addJwtWhitelistImplementations(
     collection: DeepMockProxy<Collection<Document>>,
   ) {
     collection.insertOne.mockImplementation(

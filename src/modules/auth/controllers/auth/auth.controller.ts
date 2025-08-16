@@ -43,9 +43,9 @@ export class AuthController {
     @Body() credentials: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const token = await this.authService.login(credentials);
+    const authTokens = await this.authService.login(credentials);
 
-    response.cookie(CredentialsEnum.tokenKey, token, {
+    response.cookie(CredentialsEnum.tokenKey, authTokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: environment.COOKIE_EXPIRATION,
@@ -54,9 +54,7 @@ export class AuthController {
 
     const result = HttpResponse.success({
       statusCode: HttpStatus.OK,
-      data: {
-        accessToken: token,
-      },
+      data: authTokens,
       message: this.translation.t('validation.httpMessages.success') as string,
     });
 

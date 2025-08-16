@@ -81,8 +81,6 @@ export class OtpService {
       throw new BadRequestException(
         this.translation.t('auth.otp.invalidProcess'),
       );
-    console.log(exists.exp);
-    console.log(new Date());
     const valid = this.dateService.isBefore(new Date(), exists.exp);
     if (!valid)
       throw new BadRequestException(
