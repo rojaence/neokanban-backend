@@ -60,11 +60,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
         error: responseError.message,
       });
     } else {
-      const errorMessage = exception.getResponse() as IErrorResponse;
       const responseError = {
         statusCode: status,
         message: message,
-        error: errorMessage.message,
+        error: exception.message,
       };
       response.status(status).json(responseError);
     }
