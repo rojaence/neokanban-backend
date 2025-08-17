@@ -13,6 +13,9 @@ import { MockMongoService } from '@src/database/mocks/mongo-client/mock-mongo.se
 import { JwtBlacklistCreateDTO } from '../../models/jwt-blacklist.interface';
 import { fakeAdminUser, defaultFakePassword } from '@src/test/fakes/user';
 import { JwtWhitelistRepository } from '../../repositories/jwt-whitelist.repository';
+import { ObjectId, WithId } from 'mongodb';
+import { randomUUID } from 'node:crypto';
+import { JwtWhitelist } from '../../models/jwt-whitelist.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -146,5 +149,36 @@ describe('AuthService', () => {
     expect(doc._id).toBeDefined();
     expect(refreshInWhitelist).toBeNull();
     expect(refreshInBlacklist).toBeDefined();
+  });
+
+  it('should return new tokens when refresh auth', async () => {
+    const fakeDoc: JwtWhitelist = {
+      _id: new ObjectId(),
+      userId: randomUUID(),
+      jti: randomUUID(),
+      exp: new Date(),
+      pairTokenJti: randomUUID(),
+      revokedAt: null,
+    };
+
+    jest
+      .spyOn(jwtWhitelistRepository, 'findInWhitelist')
+      .mockResolvedValueOnce(fakeDoc as WithId<JwtWhitelist>);
+
+    const credentials = {
+      username: userData.username,
+      password: defaultFakePassword,
+    };
+    const token = await service.login(credentials);
+    expect(token).toBeDefined();
+
+    const { decoded } = jwtService.decodeToken(token.refreshToken);
+    const newTokens = await service.refreshAuth(decoded!.jti!, {
+      username: decoded!.username,
+      id: decoded!.userId,
+    });
+
+    expect(newTokens.accessToken).toBeDefined();
+    expect(newTokens.refreshToken).toBeDefined();
   });
 });

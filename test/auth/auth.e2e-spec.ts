@@ -9,6 +9,7 @@ import {
   fakeAdminUser,
   FakeUserModel,
 } from '@src/test/fakes/user';
+import { AuthAccessDto } from '@src/modules/auth/models/auth.interface';
 
 describe('AuthController (e2e)', () => {
   let testApp: INestApplication<App>;
@@ -118,5 +119,28 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(blacklist.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+
+  it('/ (POST) should generate new auth tokens when refresh', async () => {
+    const loginRes = await request(testApp.getHttpServer())
+      .post('/auth/login')
+      .send({
+        username: userData.username,
+        password: defaultFakePassword,
+      });
+    expect(loginRes.status).toBe(200);
+    expect(loginRes.body.data).toHaveProperty('accessToken');
+
+    const loginBody = loginRes.body.data as AuthAccessDto;
+    console.log('🚀 ~ loginBody:', loginBody);
+
+    const refreshRes = await request(testApp.getHttpServer())
+      .post('/auth/refresh')
+      .set('Authorization', `Bearer ${loginBody.refreshToken}`);
+    const refreshBody = refreshRes.body.data as AuthAccessDto;
+    console.log('🚀 ~ refreshBody:', refreshBody);
+
+    expect(refreshBody.accessToken).toBeDefined();
+    expect(refreshBody.refreshToken).toBeDefined();
   });
 });

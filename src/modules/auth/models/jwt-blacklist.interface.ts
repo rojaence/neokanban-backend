@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 
 export const JwtRevokeReason = {
   LOGOUT: 'logout',
+  REFRESH: 'refresh',
 } as const;
 
 export interface JwtBlacklist {

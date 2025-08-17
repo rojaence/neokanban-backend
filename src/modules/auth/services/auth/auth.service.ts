@@ -14,6 +14,7 @@ import environment from '@src/environment/environment';
 import { SignOptions } from 'jsonwebtoken';
 import { AuthAccessDto } from '../../models/auth.interface';
 import { JwtWhitelistRepository } from '../../repositories/jwt-whitelist.repository';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -45,6 +46,58 @@ export class AuthService {
       );
     }
 
+    const authTokens = this.generateAuthTokens(user);
+    return authTokens;
+  }
+
+  async profile(username: string) {
+    const user = await this.authRepository.findUserProfileByUsername(username);
+    if (!user)
+      throw new UnauthorizedException(this.translation.t('auth.userNotFound'));
+    return user;
+  }
+
+  async logout(payload: JwtBlacklistCreateDTO) {
+    const doc = await this.jwtBlacklistRepository.create(payload);
+    const pairRefreshToken = await this.jwtWhitelistRepository.findInWhitelist(
+      payload.jti,
+    );
+    if (pairRefreshToken) {
+      await this.jwtWhitelistRepository.delete(pairRefreshToken._id);
+      await this.jwtBlacklistRepository.create({
+        userId: payload.userId,
+        jti: pairRefreshToken.jti,
+        revokedAt: new Date(),
+        exp: pairRefreshToken.exp,
+        reason: JwtRevokeReason.LOGOUT,
+      });
+    }
+    return doc;
+  }
+
+  async refreshAuth(
+    accessTokenJti: string,
+    user: Pick<User, 'username' | 'id'>,
+  ) {
+    const pairRefreshToken =
+      await this.jwtWhitelistRepository.findInWhitelist(accessTokenJti);
+    if (!pairRefreshToken)
+      throw new UnauthorizedException(
+        this.translation.t('auth.invalidCredentials'),
+      );
+    await this.jwtWhitelistRepository.delete(pairRefreshToken._id);
+    await this.jwtBlacklistRepository.create({
+      userId: user.id,
+      jti: pairRefreshToken.jti,
+      revokedAt: new Date(),
+      exp: pairRefreshToken.exp,
+      reason: JwtRevokeReason.REFRESH,
+    });
+    const authTokens = this.generateAuthTokens(user);
+    return authTokens;
+  }
+
+  private async generateAuthTokens(user: Pick<User, 'username' | 'id'>) {
     const accessJti = randomUUID();
     const refreshJti = randomUUID();
     const accessToken = this.jwtService.generateToken({
@@ -79,30 +132,5 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  async profile(username: string) {
-    const user = await this.authRepository.findUserProfileByUsername(username);
-    if (!user)
-      throw new UnauthorizedException(this.translation.t('auth.userNotFound'));
-    return user;
-  }
-
-  async logout(payload: JwtBlacklistCreateDTO) {
-    const doc = await this.jwtBlacklistRepository.create(payload);
-    const pairRefreshToken = await this.jwtWhitelistRepository.findInWhitelist(
-      payload.jti,
-    );
-    if (pairRefreshToken) {
-      await this.jwtWhitelistRepository.delete(pairRefreshToken._id);
-      await this.jwtBlacklistRepository.create({
-        userId: payload.userId,
-        jti: pairRefreshToken.jti,
-        revokedAt: new Date(),
-        exp: pairRefreshToken.exp,
-        reason: JwtRevokeReason.LOGOUT,
-      });
-    }
-    return doc;
   }
 }

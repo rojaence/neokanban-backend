@@ -25,6 +25,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -73,6 +74,27 @@ export class AuthController {
       statusCode: HttpStatus.OK,
       data: {
         userProfile,
+      },
+      message: this.translation.t('validation.httpMessages.success') as string,
+    });
+  }
+
+  @Post('/refresh')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get a new pair auth tokens' })
+  @ApiOkResponse({ description: 'Return a pair tokens: access and refresh' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized response' })
+  @UseGuards(AuthGuard)
+  async refresh(@User() user: IJwtPayload) {
+    const userProfile = await this.authService.profile(user.username);
+    const refreshTokens = await this.authService.refreshAuth(
+      user.jti!,
+      userProfile,
+    );
+    return HttpResponse.success({
+      statusCode: HttpStatus.OK,
+      data: {
+        ...refreshTokens,
       },
       message: this.translation.t('validation.httpMessages.success') as string,
     });
