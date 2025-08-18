@@ -72,9 +72,7 @@ export class AuthController {
     const userProfile = await this.authService.profile(user.username);
     return HttpResponse.success({
       statusCode: HttpStatus.OK,
-      data: {
-        userProfile,
-      },
+      data: userProfile,
       message: this.translation.t('validation.httpMessages.success') as string,
     });
   }
