@@ -132,13 +132,11 @@ describe('AuthController (e2e)', () => {
     expect(loginRes.body.data).toHaveProperty('accessToken');
 
     const loginBody = loginRes.body.data as AuthAccessDto;
-    console.log('🚀 ~ loginBody:', loginBody);
 
     const refreshRes = await request(testApp.getHttpServer())
       .post('/auth/refresh')
       .set('Authorization', `Bearer ${loginBody.refreshToken}`);
     const refreshBody = refreshRes.body.data as AuthAccessDto;
-    console.log('🚀 ~ refreshBody:', refreshBody);
 
     expect(refreshBody.accessToken).toBeDefined();
     expect(refreshBody.refreshToken).toBeDefined();

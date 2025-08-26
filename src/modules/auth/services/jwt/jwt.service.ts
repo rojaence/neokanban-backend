@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { sign, SignOptions, verify, decode, JwtPayload } from 'jsonwebtoken';
+import {
+  sign,
+  SignOptions,
+  verify,
+  decode,
+  JwtPayload,
+  TokenExpiredError,
+} from 'jsonwebtoken';
 import environment from '@environment/environment';
 import { IJwtPayload } from '../../models/auth.interface';
+import { JWT_RESPONSE_MESSAGES } from '../../constants/jwtResponseMessages';
 
 @Injectable()
 export class JwtService {
@@ -23,17 +31,27 @@ export class JwtService {
       return {
         decoded: decoded as IJwtPayload,
         valid: true,
+        message: JWT_RESPONSE_MESSAGES.Ok,
       };
     } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        return {
+          decoded: null,
+          valid: false,
+          message: JWT_RESPONSE_MESSAGES.AuthExpired,
+        };
+      }
       if (error instanceof Error) {
         return {
           decoded: null,
           valid: false,
+          message: JWT_RESPONSE_MESSAGES.Error,
         };
       }
       return {
         decoded: null,
         valid: false,
+        message: '',
       };
     }
   }

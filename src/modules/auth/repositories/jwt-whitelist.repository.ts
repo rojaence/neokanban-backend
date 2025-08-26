@@ -28,7 +28,7 @@ export class JwtWhitelistRepository {
   }
 
   async findInWhitelist(jti: string) {
-    const result = await this.collection.findOne({ jti });
+    const result = await this.collection.findOne({ jti: { $eq: jti } });
     return result;
   }
 }

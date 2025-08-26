@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Post,
   Res,
@@ -82,6 +83,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get a new pair auth tokens' })
   @ApiOkResponse({ description: 'Return a pair tokens: access and refresh' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized response' })
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard)
   async refresh(@User() user: IJwtPayload) {
     const userProfile = await this.authService.profile(user.username);

@@ -22,7 +22,7 @@ export class JwtBlacklistRepository {
   }
 
   async findInBlacklist(jti: string) {
-    const result = await this.collection.findOne({ jti });
+    const result = await this.collection.findOne({ jti: { $eq: jti } });
     return result;
   }
 }
