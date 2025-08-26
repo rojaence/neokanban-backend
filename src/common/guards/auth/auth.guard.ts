@@ -46,7 +46,6 @@ export class AuthGuard implements CanActivate {
     const inBlacklist = await this.jwtBlacklistRepository.findInBlacklist(
       tokenData.decoded!.jti!,
     );
-    console.log('🚀 ~ AuthGuard ~ canActivate ~ inBlacklist:', inBlacklist);
     if (inBlacklist) {
       throw new UnauthorizedException(invalidMessage);
     }
