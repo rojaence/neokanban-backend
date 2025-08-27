@@ -1,0 +1,7 @@
+Hola {{name}} 👋
+
+Gracias por unirte a NeoKanban.
+
+Ya puedes empezar a crear tus proyectos y organizar tus tareas de manera sencilla.
+
+El equipo de NeoKanban 🚀

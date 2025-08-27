@@ -8,6 +8,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception/http-exception.filter';
 import { TranslationService } from './common/helpers/i18n-translation';
 import { ConfigModule } from '@nestjs/config';
+import { MailService } from './mail/mail.service';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ConfigModule } from '@nestjs/config';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
+    MailService,
   ],
 })
 export class AppModule {}
