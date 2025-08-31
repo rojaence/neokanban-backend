@@ -14,6 +14,11 @@ export type I18nTranslations = {
             "invalidProcess": string;
         };
     };
+    "mail": {
+        "helloMail": {
+            "subject": string;
+        };
+    };
     "validation": {
         "httpMessages": {
             "success": string;

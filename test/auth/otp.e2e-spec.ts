@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { OtpProcessEnum } from '@src/modules/auth/models/otp.interface';
 import {
@@ -8,6 +9,7 @@ import {
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { setupTestApp } from '../app-e2e-setup';
+import { TranslationService } from '@src/common/helpers/i18n-translation';
 
 interface GenerateOtpResponse {
   data: {
@@ -36,10 +38,12 @@ interface OtpVerifyResponse {
 describe('OtpController (e2e)', () => {
   let testApp: INestApplication<App>;
   let userData: FakeUserModel;
+  let translationService: TranslationService;
   let token: string;
 
   beforeAll(async () => {
-    const { app } = await setupTestApp();
+    const { app, module } = await setupTestApp();
+    translationService = module.get<TranslationService>(TranslationService);
     testApp = app;
   });
 
@@ -116,5 +120,30 @@ describe('OtpController (e2e)', () => {
     const statusBody = statusRes.body as OtpStatusResponse;
     expect(statusRes.status).toBe(HttpStatus.OK);
     expect(statusBody.data.valid).toBe(true);
+  });
+
+  it('/ (POST) should throw a bad request when trying generate a new code with another active code', async () => {
+    const res = await request(testApp.getHttpServer())
+      .post('/otp/generate')
+      .send({
+        processType: OtpProcessEnum.CHANGE_PASSWORD,
+      })
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).toBe(HttpStatus.CREATED);
+    const body = res.body as GenerateOtpResponse;
+    expect(body.data.code).toBeDefined();
+
+    const retryRes = await request(testApp.getHttpServer())
+      .post('/otp/generate')
+      .send({
+        processType: OtpProcessEnum.CHANGE_PASSWORD,
+      })
+      .set('Authorization', `Bearer ${token}`);
+    expect(retryRes.status).toBe(HttpStatus.BAD_REQUEST);
+
+    const errorMessage = translationService.t('auth.otp.alreadySent') as string;
+
+    expect(retryRes.body).toHaveProperty('error');
+    expect(retryRes.body.error).toBe(errorMessage);
   });
 });

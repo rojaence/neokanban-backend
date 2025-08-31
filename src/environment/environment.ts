@@ -7,6 +7,11 @@ export interface EnvironmentConfigI {
   DEFAULT_LANGUAGE: string;
   COOKIE_EXPIRATION: number;
   JWT_REFRESH_EXPIRATION: string | number;
+  MAIL_HOST: string;
+  MAIL_PORT: number;
+  MAIL_USER: string;
+  MAIL_PASS: string;
+  MAIL_SENDER: string;
 }
 
 const environment: EnvironmentConfigI = {
@@ -26,6 +31,11 @@ const environment: EnvironmentConfigI = {
   DATABASE_URL: String(process.env.DATABASE_URL || ''),
   MONGO_DATABASE_URL: String(process.env.MONGO_DATABASE_URL || ''),
   DEFAULT_LANGUAGE: String(process.env.DEFAULT_LANGUAGE || 'es'),
+  MAIL_HOST: String(process.env.MAIL_HOST || ''),
+  MAIL_PORT: Number(process.env.MAIL_PORT || ''),
+  MAIL_USER: String(process.env.MAIL_USER || ''),
+  MAIL_PASS: String(process.env.MAIL_PASS || ''),
+  MAIL_SENDER: String(process.env.MAIL_SENDER || ''),
 };
 
 export default environment;
