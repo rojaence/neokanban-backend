@@ -34,7 +34,7 @@ export class MailService {
     const { html, text } = this.loadTemplate('helloMail', options);
     const mailOptions: MailOptionProps = {
       ...options,
-      from: environment.MAIL_USER,
+      from: environment.MAIL_SENDER,
       subject: this.translation.t('mail.helloMail.subject') as string,
       text,
       html,

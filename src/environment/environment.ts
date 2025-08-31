@@ -11,6 +11,7 @@ export interface EnvironmentConfigI {
   MAIL_PORT: number;
   MAIL_USER: string;
   MAIL_PASS: string;
+  MAIL_SENDER: string;
 }
 
 const environment: EnvironmentConfigI = {
@@ -34,6 +35,7 @@ const environment: EnvironmentConfigI = {
   MAIL_PORT: Number(process.env.MAIL_PORT || ''),
   MAIL_USER: String(process.env.MAIL_USER || ''),
   MAIL_PASS: String(process.env.MAIL_PASS || ''),
+  MAIL_SENDER: String(process.env.MAIL_SENDER || ''),
 };
 
 export default environment;
