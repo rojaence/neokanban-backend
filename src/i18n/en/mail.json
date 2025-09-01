@@ -1,5 +1,11 @@
 {
   "helloMail": {
     "subject": "👋 Welcome to NeoKanban"
+  },
+  "otp": {
+    "subject": "Verification code",
+    "processType": {
+      "resetPassword": "Reset password"
+    }
   }
 }

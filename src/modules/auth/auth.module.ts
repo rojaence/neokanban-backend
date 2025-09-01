@@ -10,12 +10,14 @@ import { OtpRepository } from './repositories/otp.repository';
 import { OtpService } from './services/otp/otp.service';
 import { OtpController } from './controllers/otp/otp.controller';
 import { JwtWhitelistRepository } from './repositories/jwt-whitelist.repository';
+import { MailService } from '@src/mail/mail.service';
 
 @Module({
   providers: [
     AuthService,
     AuthRepository,
     BcryptService,
+    MailService,
     JwtService,
     JwtBlacklistRepository,
     JwtWhitelistRepository,

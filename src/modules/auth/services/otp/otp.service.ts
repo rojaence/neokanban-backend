@@ -12,6 +12,8 @@ import {
   OtpStatusCodeType,
   OtpVerifyCodeType,
 } from '@auth/models/otp.interface';
+import { MailService } from '@src/mail/mail.service';
+import { AuthRepository } from '../../repositories/auth.repository';
 
 @Injectable()
 export class OtpService {
@@ -19,6 +21,8 @@ export class OtpService {
     private readonly otpRepository: OtpRepository,
     private readonly bcryptService: BcryptService,
     private readonly dateService: DateService,
+    private readonly mailService: MailService,
+    private readonly authRepository: AuthRepository,
     private readonly translation: TranslationService,
   ) {}
   async generateCode(userId: string, processType: OtpProcessEnum) {
@@ -48,6 +52,12 @@ export class OtpService {
       exp: this.dateService.addMinutes(new Date(), 5),
     };
     await this.otpRepository.saveProcess(process);
+    const userData = await this.authRepository.findUserById(userId);
+    await this.mailService.sendOtpEmail({
+      to: userData!.email,
+      processType,
+      processCode: code,
+    });
     return otp;
   }
 

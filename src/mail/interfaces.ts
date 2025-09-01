@@ -1,3 +1,5 @@
+import { OtpProcessEnum } from '@src/modules/auth/models/otp.interface';
+
 export interface MailOptionProps {
   from: string;
   to: string;
@@ -11,4 +13,10 @@ export interface HelloMailOptionProps {
   name: string;
 }
 
-export type TemplateName = 'helloMail';
+export interface OtpEmailOptionProps {
+  to: string;
+  processType: OtpProcessEnum;
+  processCode: string;
+}
+
+export type TemplateName = 'helloMail' | 'otpProcess';

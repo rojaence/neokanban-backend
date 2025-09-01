@@ -18,6 +18,12 @@ export type I18nTranslations = {
         "helloMail": {
             "subject": string;
         };
+        "otp": {
+            "subject": string;
+            "processType": {
+                "resetPassword": string;
+            };
+        };
     };
     "validation": {
         "httpMessages": {

@@ -23,4 +23,11 @@ export class AuthRepository {
       },
     });
   }
+
+  async findUserById(id: string) {
+    return await this.prisma.user.findUnique({
+      omit: { password: true },
+      where: { id },
+    });
+  }
 }

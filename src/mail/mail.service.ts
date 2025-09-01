@@ -4,15 +4,21 @@ import { createTransport, Transporter } from 'nodemailer';
 import {
   HelloMailOptionProps,
   MailOptionProps,
+  OtpEmailOptionProps,
   TemplateName,
 } from './interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
+import { OtpProcessEnum } from '@src/modules/auth/models/otp.interface';
 
 @Injectable()
 export class MailService {
   private transporter: Transporter;
+  private readonly templatePathName: Record<TemplateName, string> = {
+    helloMail: 'hello',
+    otpProcess: 'otp',
+  };
   constructor(private readonly translation: TranslationService) {
     this.transporter = createTransport({
       host: environment.MAIL_HOST,
@@ -43,13 +49,37 @@ export class MailService {
     return info;
   }
 
-  loadTemplate(templateName: TemplateName, variables: object) {
+  async sendOtpEmail(options: OtpEmailOptionProps) {
+    const otpMailVariables = {
+      ...options,
+      processType: this.getOtpProcessName(options.processType),
+    };
+    const { html, text } = this.loadTemplate('otpProcess', otpMailVariables);
+    const mailOptions: MailOptionProps = {
+      ...options,
+      from: environment.MAIL_SENDER,
+      subject: this.translation.t('mail.otp.subject') as string,
+      text,
+      html,
+    };
+    const info = (await this.transporter.sendMail(mailOptions)) as unknown;
+    return info;
+  }
+
+  private getOtpProcessName = (processType: OtpProcessEnum) => {
+    switch (processType) {
+      case OtpProcessEnum.CHANGE_PASSWORD:
+        return this.translation.t('mail.otp.processType.resetPassword');
+    }
+  };
+
+  private loadTemplate(templateName: TemplateName, variables: object) {
     const htmlPath = path.join(
       process.cwd(),
       'src',
       'mail',
       'templates',
-      'hello',
+      this.templatePathName[templateName],
       `${templateName}.html`,
     );
     const textPath = path.join(
@@ -57,7 +87,7 @@ export class MailService {
       'src',
       'mail',
       'templates',
-      'hello',
+      this.templatePathName[templateName],
       `${templateName}.txt`,
     );
 
