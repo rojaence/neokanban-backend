@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BaseUnitTestModule } from './common/test/unit/unit-test.module';
 import { MailService } from './mail/mail.service';
-import { MockMailService } from 'test/mocks/mail.service.mock';
+import { MockMailService } from '../test/mocks/mail.service.mock';
 
 describe('AppController', () => {
   let appController: AppController;

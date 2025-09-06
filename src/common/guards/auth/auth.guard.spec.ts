@@ -6,7 +6,6 @@ import { BaseUnitTestModule } from '@src/common/test/unit/unit-test.module';
 import { UnitTestUtils } from '@src/common/test/unit/unit-test.utils';
 import { fakeAdminUser } from '@src/test/fakes/user';
 import { JwtBlacklistRepository } from '@src/modules/auth/repositories/jwt-blacklist.repository';
-import { JWT_RESPONSE_MESSAGES } from '@src/modules/auth/constants/jwtResponseMessages';
 
 describe('AuthGuard', () => {
   let authGuard: AuthGuard;
@@ -71,7 +70,7 @@ describe('AuthGuard', () => {
     const loginFunction = async () => {
       return await authGuard.canActivate(context);
     };
-    const errorMessage = JWT_RESPONSE_MESSAGES.AuthExpired;
+    const errorMessage = translation.t('auth.invalidCredentials') as string;
     await expect(loginFunction).rejects.toThrow(errorMessage);
   });
 

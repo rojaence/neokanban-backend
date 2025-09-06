@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
-import { JWT_RESPONSE_MESSAGES } from '@src/modules/auth/constants/jwtResponseMessages';
 import { JwtBlacklistRepository } from '@src/modules/auth/repositories/jwt-blacklist.repository';
 import { JwtService } from '@src/modules/auth/services/jwt/jwt.service';
 import { Request } from 'express';
@@ -31,7 +30,7 @@ export class AuthGuard implements CanActivate {
       : null;
 
     if (!authToken || !validation?.valid) {
-      throw new UnauthorizedException(JWT_RESPONSE_MESSAGES.AuthExpired);
+      throw new UnauthorizedException(invalidMessage);
     }
 
     const tokenData = this.jwtService.decodeToken(authToken);
