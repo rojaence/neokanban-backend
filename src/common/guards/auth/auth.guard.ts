@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CredentialsEnum } from '@src/common/constants/auth';
 import { TranslationService } from '@src/common/helpers/i18n-translation';
 import { JWT_RESPONSE_MESSAGES } from '@src/modules/auth/constants/jwtResponseMessages';
 import { JwtBlacklistRepository } from '@src/modules/auth/repositories/jwt-blacklist.repository';
@@ -25,20 +24,14 @@ export class AuthGuard implements CanActivate {
       'auth.invalidCredentials',
     ) as string;
 
-    let authToken = request.cookies[CredentialsEnum.tokenKey] as string;
-    let validation = authToken ? this.jwtService.verifyToken(authToken) : null;
+    const authHeader = request.headers.authorization;
+    const authToken = authHeader ? authHeader.split(' ')[1] : '';
+    const validation = authToken
+      ? this.jwtService.verifyToken(authToken)
+      : null;
 
     if (!authToken || !validation?.valid) {
-      const authHeader = request.headers.authorization;
-      authToken = authHeader ? authHeader.split(' ')[1] : '';
-      validation = authToken ? this.jwtService.verifyToken(authToken) : null;
-    }
-
-    if (!authToken || !validation?.valid) {
-      if (validation?.message === JWT_RESPONSE_MESSAGES.AuthExpired) {
-        throw new UnauthorizedException(JWT_RESPONSE_MESSAGES.AuthExpired);
-      }
-      throw new UnauthorizedException(invalidMessage);
+      throw new UnauthorizedException(JWT_RESPONSE_MESSAGES.AuthExpired);
     }
 
     const tokenData = this.jwtService.decodeToken(authToken);

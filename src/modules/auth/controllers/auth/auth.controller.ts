@@ -47,13 +47,6 @@ export class AuthController {
   ) {
     const authTokens = await this.authService.login(credentials);
 
-    response.cookie(CredentialsEnum.tokenKey, authTokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: environment.COOKIE_EXPIRATION,
-      sameSite: 'lax',
-    });
-
     const result = HttpResponse.success({
       statusCode: HttpStatus.OK,
       data: authTokens,
@@ -109,12 +102,6 @@ export class AuthController {
     @User() user: IJwtPayload,
     @Res({ passthrough: true }) response: Response,
   ) {
-    response.cookie(CredentialsEnum.tokenKey, null, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      expires: new Date(0),
-      sameSite: 'lax',
-    });
 
     await this.authService.logout({
       exp: new Date(user.exp! * 1000),

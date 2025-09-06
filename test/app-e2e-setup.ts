@@ -4,6 +4,8 @@ import { AppModule } from '../src/app.module';
 import { execSync } from 'child_process';
 import { App } from 'supertest/types';
 import * as cookieParser from 'cookie-parser';
+import { MailService } from '@src/mail/mail.service';
+import { MockMailService } from './mocks/mail.service.mock';
 
 interface SetupTestAppI {
   app: INestApplication<App>;
@@ -20,7 +22,10 @@ export const setupTestApp = async (): Promise<SetupTestAppI> => {
 
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(MailService)
+    .useClass(MockMailService)
+    .compile();
 
   const app: INestApplication<App> = moduleFixture.createNestApplication();
   app.use(cookieParser());

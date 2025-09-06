@@ -3,6 +3,7 @@ import environment from '@src/environment/environment';
 import { createTransport, Transporter } from 'nodemailer';
 import {
   HelloMailOptionProps,
+  Mailer,
   MailOptionProps,
   OtpEmailOptionProps,
   TemplateName,
@@ -13,7 +14,7 @@ import { TranslationService } from '@src/common/helpers/i18n-translation';
 import { OtpProcessEnum } from '@src/modules/auth/models/otp.interface';
 
 @Injectable()
-export class MailService {
+export class MailService implements Mailer {
   private transporter: Transporter;
   private readonly templatePathName: Record<TemplateName, string> = {
     helloMail: 'hello',

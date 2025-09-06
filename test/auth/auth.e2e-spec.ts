@@ -41,7 +41,6 @@ describe('AuthController (e2e)', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data).toHaveProperty('accessToken');
     expect(typeof res.body.data.accessToken).toBe('string');
-    expect(res.headers['set-cookie']).toBeDefined();
   });
 
   it('/ (POST) should return a 401 with invalid credentials', async () => {
@@ -57,7 +56,6 @@ describe('AuthController (e2e)', () => {
     expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
     expect(res.body).toHaveProperty('error');
     expect(res.body.error).toBe(errorMessage);
-    expect(res.headers['set-cookie']).toBeUndefined();
   });
 
   it('/ (GET) should throw unauthorized if no authentication', async () => {
@@ -76,13 +74,10 @@ describe('AuthController (e2e)', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data).toHaveProperty('accessToken');
     expect(typeof res.body.data.accessToken).toBe('string');
-    expect(res.headers['set-cookie']).toBeDefined();
-
-    const cookies = res.headers['set-cookie'];
 
     const logout = await request(testApp.getHttpServer())
       .post('/auth/logout')
-      .set('Cookie', cookies);
+      .set('Authorization', `Bearer ${res.body.data.accessToken}`);
     expect(logout.status).toBe(200);
 
     const profile = await request(testApp.getHttpServer()).get('/auth/profile');
@@ -100,17 +95,11 @@ describe('AuthController (e2e)', () => {
     expect(res.body).toHaveProperty('data');
     expect(res.body.data).toHaveProperty('accessToken');
     expect(typeof res.body.data.accessToken).toBe('string');
-    expect(res.headers['set-cookie']).toBeDefined();
-
-    const cookies = res.headers['set-cookie'];
 
     const logout = await request(testApp.getHttpServer())
       .post('/auth/logout')
-      .set('Cookie', cookies);
+      .set('Authorization', `Bearer ${res.body.data.accessToken}`);
     expect(logout.status).toBe(200);
-
-    const profile = await request(testApp.getHttpServer()).get('/auth/profile');
-    expect(profile.status).toBe(HttpStatus.UNAUTHORIZED);
 
     const token = res.body.data.accessToken as string;
 

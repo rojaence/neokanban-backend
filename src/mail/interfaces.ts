@@ -19,4 +19,10 @@ export interface OtpEmailOptionProps {
   processCode: string;
 }
 
+export interface Mailer {
+  send: (options: MailOptionProps) => Promise<unknown>;
+  sendHelloMail: (options: HelloMailOptionProps) => Promise<unknown>;
+  sendOtpEmail: (options: OtpEmailOptionProps) => Promise<unknown>;
+}
+
 export type TemplateName = 'helloMail' | 'otpProcess';
