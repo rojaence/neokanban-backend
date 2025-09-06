@@ -56,7 +56,7 @@ export class OtpService {
     await this.mailService.sendOtpEmail({
       to: userData!.email,
       processType,
-      processCode: code,
+      processCode: otp,
     });
     return otp;
   }
