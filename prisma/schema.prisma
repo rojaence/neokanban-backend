@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
@@ -18,6 +19,10 @@ model Action {
   option        Option      @relation(fields: [optionId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  systemPermissions SystemRolePermission[]
+  workpacePermissions WorkspaceRolePermission[]
+
   @@map("sec_actions")
   @@schema("security")
   @@unique([optionId, name])
@@ -46,7 +51,10 @@ model Option {
   uri           String          @default("")
   order         Int             @default(0)
   isActive      Boolean       @default(true)
+
   module        Module          @relation(fields: [moduleId], references: [id])
+  actions       Action[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_options")
@@ -129,6 +137,8 @@ model Project {
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
+  tasks       Task[]
+
   @@map("wsp_projects")
   @@schema("workspace")
 }
@@ -164,7 +174,7 @@ model Task {
   id          String      @id @default(uuid()) @db.Uuid
   title       String
   description String?
-  projectId   String
+  projectId   String     @db.Uuid
   createdById String     @db.Uuid
   updatedById String     @db.Uuid
 
@@ -197,6 +207,9 @@ model User {
   systemRoles UserSystemRole[]
   workspaces  WorkspaceMember[]
   ownedWorkspaces Workspace[]
+
+  createdTasks Task[]    @relation("TaskCreator")
+  updatedTasks Task[]    @relation("TaskUpdater")
 
   @@map("sec_users")
   @@schema("security")
