@@ -1,23 +1,26 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["public", "security", "manager"]
+  schemas  = ["public", "security", "workspace"]
 }
 
 model Action {
   id            String      @id @default(uuid()) @db.Uuid
-  name          String          @unique
+  name          String
+  code          String
   description   String?
-  profileOptions ProfileOption[]
+  isActive      Boolean       @default(true)
+  optionId      String      @db.Uuid
+  option        Option      @relation(fields: [optionId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_actions")
   @@schema("security")
+  @@unique([optionId, name])
 }
 
 model Module {
@@ -25,7 +28,9 @@ model Module {
   name        String
   description String?
   uri         String   @default("")
-  options      Option[]
+  order       Int      @default(0)
+  isActive    Boolean       @default(true)
+  options     Option[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_modules")
@@ -33,43 +38,125 @@ model Module {
 }
 
 model Option {
+  id            String      @id @default(uuid()) @db.Uuid
   name          String          @unique
   description   String?
   moduleId      String          @db.Uuid
-  id            String      @id @default(uuid()) @db.Uuid
   iconName      String?
   uri           String          @default("")
+  order         Int             @default(0)
+  isActive      Boolean       @default(true)
   module        Module          @relation(fields: [moduleId], references: [id])
-  profileOptions ProfileOption[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("sec_options")
   @@schema("security")
 }
 
-model Profile {
-  id            String      @id @default(uuid()) @db.Uuid
+model SystemRole {
+  id            String          @id @default(uuid()) @db.Uuid
   name          String          @unique
-  description   String?
-  profileOptions ProfileOption[]
-  userProfiles   UserProfile[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("sec_profiles")
+
+  users         UserSystemRole[]
+  permissions   SystemRolePermission[]
+  @@map("sec_system_roles")
   @@schema("security")
 }
 
-model ProfileOption {
-  profileId String      @db.Uuid
-  actionId  String      @db.Uuid
-  id        String      @id @default(uuid()) @db.Uuid
-  optionId  String      @db.Uuid
-  action    Action  @relation(fields: [actionId], references: [id])
-  option    Option  @relation(fields: [optionId], references: [id])
-  profile   Profile @relation(fields: [profileId], references: [id])
+model WorkspaceRole {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String          @unique
+  isSystem      Boolean
+
+  members       WorkspaceMember[]
+  permissions   WorkspaceRolePermission[]
+  @@map("sec_workspace_roles")
+  @@schema("security")
+}
+
+model UserSystemRole {
+  userId        String          @db.Uuid
+  systemRoleId  String          @db.Uuid
+
+  user          User            @relation(fields: [userId], references: [id])
+  systemRole    SystemRole      @relation(fields: [systemRoleId], references: [id])
+
+  @@id([userId, systemRoleId])
+  @@map("sec_user_system_roles")
+  @@schema("security")
+}
+
+model Workspace {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String
+  ownerId       String          @db.Uuid
+
+  owner         User            @relation(fields: [ownerId], references: [id])
+  members       WorkspaceMember[]
+  projects      Project[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  @@map("sec_profile_options")
+  @@map("wsp_workspaces")
+  @@schema("workspace")
+}
+
+model WorkspaceMember {
+  workspaceId   String         @db.Uuid
+  userId        String         @db.Uuid
+  roleId        String         @db.Uuid
+  isActive      Boolean        @default(true)
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  role          WorkspaceRole  @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  @@id([workspaceId, userId])
+  @@map("wsp_workspace_members")
+  @@schema("workspace")
+}
+
+model Project {
+  id           String         @id @default(uuid()) @db.Uuid
+  workspaceId  String         @db.Uuid
+
+  workspace    Workspace      @relation(fields: [workspaceId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@map("wsp_projects")
+  @@schema("workspace")
+}
+
+
+model SystemRolePermission {
+  id          String          @id @default(uuid()) @db.Uuid
+  roleId      String          @db.Uuid
+  actionId    String          @db.Uuid
+
+  role        SystemRole      @relation(fields: [roleId], references: [id])
+  action      Action          @relation(fields: [actionId], references: [id])
+
+  @@unique([roleId, actionId])
+  @@map("sec_system_role_permissions")
+  @@schema("security")
+}
+
+model WorkspaceRolePermission {
+  id          String          @id @default(uuid()) @db.Uuid
+  roleId      String          @db.Uuid
+  actionId    String          @db.Uuid
+
+  role        WorkspaceRole   @relation(fields: [roleId], references: [id])
+  action      Action          @relation(fields: [actionId], references: [id])
+
+  @@unique([roleId, actionId])
+  @@map("sec_workspace_role_permissions")
   @@schema("security")
 }
 
@@ -77,12 +164,20 @@ model Task {
   id          String      @id @default(uuid()) @db.Uuid
   title       String
   description String?
-  userId      String      @db.Uuid
-  user        User    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("man_tasks")
-  @@schema("manager")
+  projectId   String
+  createdById String     @db.Uuid
+  updatedById String     @db.Uuid
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  deletedAt   DateTime?
+  
+  project     Project     @relation(fields: [projectId], references: [id])
+  createdBy   User        @relation("TaskCreator", fields: [createdById], references: [id])
+  updatedBy   User?       @relation("TaskUpdater", fields: [updatedById], references: [id])
+
+  @@map("wsp_tasks")
+  @@schema("workspace")
 }
 
 
@@ -90,26 +185,19 @@ model User {
   id          String      @id @default(uuid()) @db.Uuid
   name        String
   surname     String
-  email       String        @unique
+  email       String      @unique
   password    String
-  username    String        @unique
-  tasks        Task[]
-  userProfiles UserProfile[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  username    String      @unique
+  isStaff     Boolean     @default(false)
+    
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  systemRoles UserSystemRole[]
+  workspaces  WorkspaceMember[]
+  ownedWorkspaces Workspace[]
+
   @@map("sec_users")
-  @@schema("security")
-}
-
-model UserProfile {
-  userId    String  @db.Uuid 
-  profileId String  @db.Uuid
-  profile   Profile @relation(fields: [profileId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@id([userId, profileId])
-  @@map("sec_user_profiles")
   @@schema("security")
 }
