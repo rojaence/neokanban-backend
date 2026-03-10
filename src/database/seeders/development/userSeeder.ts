@@ -16,6 +16,9 @@ async function main() {
     name: fakeAdminUser.name,
     surname: fakeAdminUser.surname,
     password,
+    username: '',
+    isStaff: true,
+    deletedAt: null,
   };
   await prisma.user.upsert({
     where: { email: adminData.email },
@@ -26,6 +29,8 @@ async function main() {
       surname: fakeAdminUser.surname,
       username: fakeAdminUser.username,
       password,
+      isStaff: adminData.isStaff,
+      deletedAt: adminData.deletedAt,
     },
   });
 }

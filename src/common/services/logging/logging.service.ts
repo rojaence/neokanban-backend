@@ -21,28 +21,32 @@ export class LoggingService {
       query: request.query,
       exception: exception,
     };
+    if (environment.NODE_ENV !== 'production') {
+      if (exception instanceof HttpException) {
+        const response = exception.getResponse();
+        this.logger.warn({
+          ...errorDetails,
+          message: exception.message,
+          response,
+        });
+      } else if (exception instanceof Error) {
+        this.logger.error({
+          ...errorDetails,
+          message: exception.message,
+          stack: exception.stack,
+        });
+      } else {
+        this.logger.error({
+          ...errorDetails,
+          exception: exception,
+        });
+      }
+    }
+    if (environment.NODE_ENV === 'test') {
+      return;
+    }
     await this.mongoService.collection('audit_logging').insertOne({
       errorDetails,
     });
-    if (environment.NODE_ENV === 'production') return;
-    if (exception instanceof HttpException) {
-      const response = exception.getResponse();
-      this.logger.warn({
-        ...errorDetails,
-        message: exception.message,
-        response,
-      });
-    } else if (exception instanceof Error) {
-      this.logger.error({
-        ...errorDetails,
-        message: exception.message,
-        stack: exception.stack,
-      });
-    } else {
-      this.logger.error({
-        ...errorDetails,
-        exception: exception,
-      });
-    }
   }
 }
