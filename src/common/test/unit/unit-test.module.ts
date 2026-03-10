@@ -14,6 +14,7 @@ import { MockMailService } from '../../../../test/mocks/mail.service.mock';
 import { OtpService } from '@src/modules/auth/services/otp/otp.service';
 import { OtpRepository } from '@src/modules/auth/repositories/otp.repository';
 import { AuthRepository } from '@src/modules/auth/repositories/auth.repository';
+import { LoggingService } from '@src/common/services/logging/logging.service';
 
 export class BaseUnitTestModule {
   static forRoot(): DynamicModule {
@@ -47,6 +48,7 @@ export class BaseUnitTestModule {
         OtpService,
         OtpRepository,
         AuthRepository,
+        LoggingService,
         DateService,
         {
           provide: MailService,

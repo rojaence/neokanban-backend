@@ -17,6 +17,7 @@ export class MockMongoService {
     const collections: CollectionNameType[] = [
       'sec_jwt_blacklist',
       'sec_jwt_whitelist',
+      'audit_logging',
     ];
     for (const name of collections) {
       const collection = mockDeep<Collection<Document>>();
@@ -27,6 +28,9 @@ export class MockMongoService {
         case 'sec_jwt_whitelist':
           this.addJwtWhitelistImplementations(collection);
           break;
+        case 'audit_logging':
+          this.addLoggingImplementations(collection);
+          break;
       }
       this.db[name] = collection;
     }
@@ -35,22 +39,22 @@ export class MockMongoService {
   addJwtBlacklistImplementations(
     collection: DeepMockProxy<Collection<Document>>,
   ) {
-    collection.insertOne.mockImplementation(
-      async (doc: OptionalId<Document>): Promise<InsertOneResult> => {
-        const inserted = { _id: new ObjectId(), ...doc };
-        await UnitTestUtils.sleepTest(100);
-        return {
-          acknowledged: true,
-          insertedId: inserted._id,
-        };
-      },
-    );
+    this.mockInsert(collection);
     collection.findOne.mockResolvedValue(null);
   }
 
   addJwtWhitelistImplementations(
     collection: DeepMockProxy<Collection<Document>>,
   ) {
+    this.mockInsert(collection);
+    collection.findOne.mockResolvedValue(null);
+  }
+
+  addLoggingImplementations(collection: DeepMockProxy<Collection<Document>>) {
+    this.mockInsert(collection);
+  }
+
+  private mockInsert(collection: DeepMockProxy<Collection<Document>>) {
     collection.insertOne.mockImplementation(
       async (doc: OptionalId<Document>): Promise<InsertOneResult> => {
         const inserted = { _id: new ObjectId(), ...doc };
@@ -61,7 +65,6 @@ export class MockMongoService {
         };
       },
     );
-    collection.findOne.mockResolvedValue(null);
   }
 
   collection<T extends Document = Document>(
